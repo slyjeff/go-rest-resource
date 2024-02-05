@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="ALL" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="4c18c751-9569-45bc-9604-b4b5a28e9fc6" name="Changes" comment="Added a test to prove arrays of structs are transformed into maps" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Go File" />
+      </list>
+    </option>
+  </component>
+  <component name="GOROOT" url="file://$PROJECT_DIR$/../../../../Program Files/Go" />
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="createdproject" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="UPDATE_TYPE" value="REBASE" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 4
+}</component>
+  <component name="ProjectId" id="2bv2ZntD5c9GEtVdEhHKTKnH7CV" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "DefaultGoTemplateProperty": "Go File",
+    "Go Test.Test_DatMustTransformStructsToArraysInSlices in RestResource.executor": "Run",
+    "Go Test.Test_DataMustAddArrayToResource in RestResource.executor": "Run",
+    "Go Test.Test_DataMustAddSliceToResource in RestResource.executor": "Run",
+    "Go Test.Test_DataMustAddStringToResource in RestResource.executor": "Run",
+    "Go Test.Test_DataMustBeChainable in RestResource.executor": "Run",
+    "Go Test.Test_DataMustStoreIntAsStrings in RestResource.executor": "Run",
+    "Go Test.Test_DataMustTransformStructToMap in RestResource.executor": "Run",
+    "Go Test.Test_DataNameMustBeCamelCase in RestResource.executor": "Run",
+    "Go Test.data_test.go.executor": "Run",
+    "Go Test.go test RestResource.executor": "Run",
+    "Go Test.gobench RestResource.executor": "Run",
+    "Go Test.restresource_test.go.executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.go.formatter.settings.were.checked": "true",
+    "RunOnceActivity.go.migrated.go.modules.settings": "true",
+    "RunOnceActivity.go.modules.automatic.dependencies.download": "true",
+    "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "go.import.settings.migrated": "true",
+    "last_opened_file_path": "C:/Users/Jeff/GolandProjects/RestResource",
+    "node.js.detected.package.eslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm"
+  }
+}]]></component>
+  <component name="RunManager" selected="Go Test.Test_DatMustTransformStructsToArraysInSlices in RestResource">
+    <configuration name="Test_DatMustTransformStructsToArraysInSlices in RestResource" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="RestResource" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="RestResource" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <pattern value="^\QTest_DatMustTransformStructsToArraysInSlices\E$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Test_DataMustAddArrayToResource in RestResource" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="RestResource" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="RestResource" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <pattern value="^\QTest_DataMustAddArrayToResource\E$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Test_DataMustAddSliceToResource in RestResource" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="RestResource" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="RestResource" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <pattern value="^\QTest_DataMustAddSliceToResource\E$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="data_test.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="RestResource" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="FILE" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/data_test.go" />
+      <framework value="gotest" />
+      <method v="2" />
+    </configuration>
+    <configuration name="gobench RestResource" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="RestResource" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="RestResource" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gobench" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Go Test.Test_DatMustTransformStructsToArraysInSlices in RestResource" />
+        <item itemvalue="Go Test.Test_DataMustAddSliceToResource in RestResource" />
+        <item itemvalue="Go Test.Test_DataMustAddArrayToResource in RestResource" />
+        <item itemvalue="Go Test.gobench RestResource" />
+        <item itemvalue="Go Test.data_test.go" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-gosdk-266795519c66-911b893a1778-org.jetbrains.plugins.go.sharedIndexes.bundled-GO-233.13135.104" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Created first tests" />
+    <MESSAGE value="Made &quot;Data&quot; Method Chainable" />
+    <MESSAGE value="Added ability to turn structs into maps for storage in resources" />
+    <MESSAGE value="Changed the way values were stored to use a single map for maps and values" />
+    <MESSAGE value="Added ability to add arrays/slice data" />
+    <MESSAGE value="Added a test to prove arrays of structs are transformed into maps" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added a test to prove arrays of structs are transformed into maps" />
+  </component>
+  <component name="VgoProject">
+    <settings-migrated>true</settings-migrated>
+  </component>
+</project>
