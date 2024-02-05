@@ -1,4 +1,4 @@
-package restresource
+package RestResource
 
 import (
 	"fmt"

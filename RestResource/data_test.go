@@ -1,4 +1,4 @@
-package restresource
+package RestResource
 
 import (
 	"github.com/stretchr/testify/assert"

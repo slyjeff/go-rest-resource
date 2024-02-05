@@ -1,4 +1,4 @@
-package restresource
+package RestResource
 
 type ResourceData interface {
 	AsString() (string, bool)
