@@ -19,3 +19,7 @@ func (cm *ConfigureMap) Map(fieldName string) *ConfigureMap {
 
 	return cm
 }
+
+func (cm *ConfigureMap) EndMap() *Resource {
+	return cm.resource
+}
