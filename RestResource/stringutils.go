@@ -1,4 +1,4 @@
-package RestResource
+package restresource
 
 import (
 	"unicode"

@@ -1,7 +1,6 @@
-package RestResource
+package restresource
 
 import (
-	"fmt"
 	"reflect"
 )
 
@@ -32,7 +31,8 @@ func createResourceData(value interface{}) ResourceData {
 }
 
 func createResourceValue(value interface{}) *resourceValue {
-	return &resourceValue{fmt.Sprint(value)}
+
+	return &resourceValue{value}
 }
 
 func createResourceSlice(value interface{}) *resourceSlice {

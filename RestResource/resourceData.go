@@ -1,16 +1,16 @@
-package RestResource
+package restresource
 
 type ResourceData interface {
-	AsString() (string, bool)
+	AsValue() (interface{}, bool)
 	AsSlice() ([]ResourceData, bool)
 	AsMap() (map[string]ResourceData, bool)
 }
 
 type resourceValue struct {
-	value string
+	value interface{}
 }
 
-func (rv *resourceValue) AsString() (string, bool) {
+func (rv *resourceValue) AsValue() (interface{}, bool) {
 	return rv.value, true
 }
 
@@ -26,11 +26,13 @@ type resourceSlice struct {
 	Values []ResourceData
 }
 
-func (rs *resourceSlice) AsString() (string, bool) {
-	return "", false
+func (rs *resourceSlice) AsValue() (interface{}, bool) {
+
+	return nil, false
 }
 
 func (rs *resourceSlice) AsSlice() ([]ResourceData, bool) {
+
 	return rs.Values, true
 }
 
@@ -42,8 +44,8 @@ type resourceMap struct {
 	Values map[string]ResourceData
 }
 
-func (rm *resourceMap) AsString() (string, bool) {
-	return "", false
+func (rm *resourceMap) AsValue() (interface{}, bool) {
+	return nil, false
 }
 
 func (rm *resourceMap) AsSlice() ([]ResourceData, bool) {
