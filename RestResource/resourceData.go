@@ -11,6 +11,9 @@ type resourceValue struct {
 }
 
 func (rv *resourceValue) AsValue() (interface{}, bool) {
+	if rv == nil {
+		return nil, false
+	}
 	return rv.value, true
 }
 
