@@ -1,9 +1,9 @@
 package resourceformat
 
 import (
-	"RestResource/restresource"
 	"fmt"
 	"reflect"
+	"restresource/restresource"
 	"strings"
 )
 

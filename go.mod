@@ -1,4 +1,4 @@
-module RestResource
+module restresource
 
 go 1.21
 

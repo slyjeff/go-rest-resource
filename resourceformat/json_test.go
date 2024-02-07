@@ -1,8 +1,8 @@
 package resourceformat
 
 import (
-	"RestResource/restresource"
 	"github.com/stretchr/testify/assert"
+	"restresource/restresource"
 	"testing"
 )
 
