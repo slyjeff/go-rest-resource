@@ -1,6 +1,7 @@
 package restresource
 
 import (
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -53,6 +54,27 @@ func Test_DataMustStoreInt(t *testing.T) {
 	value, ok := resource.Values["number"].AsValue()
 	a.True(ok, "'number' must exist")
 	a.Equal(42, value, "'number' value must be '42'.")
+}
+
+func Test_FormattedDataAddValueAndFormattingInformation(t *testing.T) {
+	//arrange
+	number := 4234.3982
+	var resource Resource
+
+	//act
+	resource.FormattedData("number", number, func(v interface{}) string { return fmt.Sprintf("%.02f", v) })
+
+	//assert
+	a := assert.New(t)
+	value, ok := resource.Values["number"].AsValue()
+	a.True(ok, "'number' must exist")
+
+	var fd FormattedData
+	fd, ok = value.(FormattedData)
+	a.True(ok, "'number' must be of type formatted data")
+
+	a.Equal(4234.3982, fd.Value, "'number' value must be '4234.3982'.")
+	a.Equal("4234.40", fd.FormattedString(), "'number' value  formatted as string correctly.")
 }
 
 func Test_DataMustBeChainable(t *testing.T) {

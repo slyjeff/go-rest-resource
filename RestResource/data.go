@@ -9,6 +9,12 @@ func (r *Resource) Data(name string, value interface{}) *Resource {
 	return r
 }
 
+func (r *Resource) FormattedData(name string, value interface{}, callback FormatDataCallback) *Resource {
+	fd := FormattedData{value, callback}
+	r.addToResourceMap(name, fd)
+	return r
+}
+
 func (rm *resourceMap) addToResourceMap(name string, value interface{}) {
 	name = makeCamelCase(name)
 
@@ -20,6 +26,11 @@ func (rm *resourceMap) addToResourceMap(name string, value interface{}) {
 }
 
 func createResourceData(value interface{}) ResourceData {
+	_, ok := value.(FormattedData)
+	if ok {
+		return createResourceValue(value)
+	}
+
 	switch reflect.TypeOf(value).Kind() {
 	case reflect.Struct:
 		return createResourceMap(value)
