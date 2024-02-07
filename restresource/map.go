@@ -20,6 +20,14 @@ func (cm *ConfigureMap) Map(fieldName string) *ConfigureMap {
 	return cm
 }
 
+func (cm *ConfigureMap) MapFormatted(fieldName string, callback FormatDataCallback) *ConfigureMap {
+	v := reflect.ValueOf(cm.source).FieldByName(fieldName).Interface()
+	fd := FormattedData{v, callback}
+	cm.resource.Data(fieldName, fd)
+
+	return cm
+}
+
 func (cm *ConfigureMap) EndMap() *Resource {
 	return cm.resource
 }

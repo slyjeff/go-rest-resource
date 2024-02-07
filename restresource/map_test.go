@@ -1,6 +1,7 @@
 package restresource
 
 import (
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -80,4 +81,33 @@ func Test_MapDataFromMustAddFromMultipleStructs(t *testing.T) {
 	boolValue, ok = resource.Values["boolValue"].AsValue()
 	a.True(ok, "'boolValue' must exist")
 	a.Equal(false, boolValue, "'boolValue' value must be false.")
+}
+
+func Test_MapDataFromMustAddFormattedData(t *testing.T) {
+	//arrange
+	testStruct := struct {
+		FloatValue float64
+	}{
+		FloatValue: 982.4332,
+	}
+
+	var resource Resource
+
+	formatToTwoDecimals := func(v interface{}) string { return fmt.Sprintf("%.02f", v) }
+
+	//act
+	resource.MapDataFrom(testStruct).
+		MapFormatted("FloatValue", formatToTwoDecimals)
+
+	//assert
+	a := assert.New(t)
+	value, ok := resource.Values["floatValue"].AsValue()
+	a.True(ok, "'floatValue' must exist")
+
+	var fd FormattedData
+	fd, ok = value.(FormattedData)
+	a.True(ok, "'floatValue' must be of type formatted data")
+
+	a.Equal(982.4332, fd.Value, "'floatValue' value must be '4234.3982'.")
+	a.Equal("982.43", fd.FormattedString(), "'floatValue' value  formatted as string correctly.")
 }

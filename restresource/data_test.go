@@ -60,9 +60,10 @@ func Test_FormattedDataAddValueAndFormattingInformation(t *testing.T) {
 	//arrange
 	number := 4234.3982
 	var resource Resource
+	formatToTwoDecimals := func(v interface{}) string { return fmt.Sprintf("%.02f", v) }
 
 	//act
-	resource.FormattedData("number", number, func(v interface{}) string { return fmt.Sprintf("%.02f", v) })
+	resource.FormattedData("number", number, formatToTwoDecimals)
 
 	//assert
 	a := assert.New(t)
