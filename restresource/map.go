@@ -1,14 +1,18 @@
 package restresource
 
-import "reflect"
+import (
+	"golang.org/x/exp/slices"
+	"reflect"
+)
 
 type ConfigureMap struct {
-	resource *Resource
-	source   interface{}
+	resource       *Resource
+	source         interface{}
+	excludedFields []string
 }
 
 func (r *Resource) MapDataFrom(source interface{}) *ConfigureMap {
-	cm := ConfigureMap{r, source}
+	cm := ConfigureMap{r, source, make([]string, 0)}
 	return &cm
 }
 
@@ -16,6 +20,37 @@ func (cm *ConfigureMap) Map(fieldName string) *ConfigureMap {
 	v := reflect.ValueOf(cm.source).FieldByName(fieldName).Interface()
 
 	cm.resource.Data(fieldName, v)
+
+	return cm
+}
+
+func (cm *ConfigureMap) MapAll() *ConfigureMap {
+	t := reflect.TypeOf(cm.source)
+	v := reflect.ValueOf(cm.source)
+
+	for i := 0; i < t.NumField(); i++ {
+		fieldName := makeCamelCase(t.Field(i).Name)
+
+		if slices.Contains(cm.excludedFields, fieldName) {
+			continue
+		}
+
+		if _, ok := cm.resource.Values[fieldName]; ok {
+			continue
+		}
+
+		value := v.Field(i).Interface()
+		cm.resource.Data(fieldName, value)
+	}
+
+	return cm
+}
+
+func (cm *ConfigureMap) Exclude(fieldName string) *ConfigureMap {
+	fieldName = makeCamelCase(fieldName)
+	cm.excludedFields = append(cm.excludedFields, fieldName)
+
+	delete(cm.resource.Values, fieldName)
 
 	return cm
 }
