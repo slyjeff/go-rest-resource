@@ -11,6 +11,10 @@ type ConfigureMap struct {
 	excludedFields []string
 }
 
+func (r *Resource) MapAllDataFrom(source interface{}) *Resource {
+	return r.MapDataFrom(source).MapAll().EndMap()
+}
+
 func (r *Resource) MapDataFrom(source interface{}) *ConfigureMap {
 	cm := ConfigureMap{r, source, make([]string, 0)}
 	return &cm

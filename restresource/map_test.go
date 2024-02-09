@@ -208,3 +208,36 @@ func Test_MapAllMustNotIncludeExcludedFields(t *testing.T) {
 	_, ok = resource.Values["boolValue"]
 	a.False(ok, "boolValue must be excluded.")
 }
+
+func Test_MapAllDataFromMustNotRequireEndMap(t *testing.T) {
+	//arrange
+	testStruct := struct {
+		IntValue    int
+		StringValue string
+	}{
+		IntValue:    982,
+		StringValue: "Some test text.",
+	}
+
+	var resource Resource
+
+	//act
+	resource.MapAllDataFrom(testStruct).
+		Data("boolValue", false)
+
+	//assert
+	a := assert.New(t)
+	intValue, ok := resource.Values["intValue"].AsValue()
+	a.True(ok, "'intValue' must exist")
+	a.Equal(982, intValue, "'intValue' value must be '982'")
+
+	var stringValue interface{}
+	stringValue, ok = resource.Values["stringValue"].AsValue()
+	a.True(ok, "'stringValue' must exist")
+	a.Equal("Some test text.", stringValue, "'stringValue' value must be 'Some test text'.")
+
+	var boolValue interface{}
+	boolValue, ok = resource.Values["boolValue"].AsValue()
+	a.True(ok, "'boolValue' must exist")
+	a.Equal(false, boolValue, "'boolValue' value must be false.")
+}
