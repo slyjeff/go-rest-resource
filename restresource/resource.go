@@ -1,5 +1,9 @@
 package restresource
 
 type Resource struct {
-	resourceMap
+	ResourceMap
+}
+
+type ResourceMap struct {
+	Values map[string]interface{}
 }

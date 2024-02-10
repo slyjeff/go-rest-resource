@@ -27,12 +27,12 @@ func Test_MapDataFromMustAddIndicatedProperties(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	intValue, ok := resource.Values["intValue"].AsValue()
+	intValue, ok := resource.Values["intValue"]
 	a.True(ok, "'intValue' must exist")
 	a.Equal(982, intValue, "'intValue' value must be '982'")
 
 	var stringValue interface{}
-	stringValue, ok = resource.Values["stringValue"].AsValue()
+	stringValue, ok = resource.Values["stringValue"]
 	a.True(ok, "'stringValue' must exist")
 	a.Equal("Some test text.", stringValue, "'stringValue' value must be 'Some test text.'")
 
@@ -68,17 +68,17 @@ func Test_MapDataFromMustAddFromMultipleStructs(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	intValue, ok := resource.Values["intValue"].AsValue()
+	intValue, ok := resource.Values["intValue"]
 	a.True(ok, "'intValue' must exist")
 	a.Equal(982, intValue, "'intValue' value must be '982'")
 
 	var stringValue interface{}
-	stringValue, ok = resource.Values["stringValue"].AsValue()
+	stringValue, ok = resource.Values["stringValue"]
 	a.True(ok, "'stringValue' must exist")
 	a.Equal("Some test text.", stringValue, "'stringValue' value must be 'Some test text'.")
 
 	var boolValue interface{}
-	boolValue, ok = resource.Values["boolValue"].AsValue()
+	boolValue, ok = resource.Values["boolValue"]
 	a.True(ok, "'boolValue' must exist")
 	a.Equal(false, boolValue, "'boolValue' value must be false.")
 }
@@ -101,7 +101,7 @@ func Test_MapDataFromMustAddFormattedData(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	value, ok := resource.Values["floatValue"].AsValue()
+	value, ok := resource.Values["floatValue"]
 	a.True(ok, "'floatValue' must exist")
 
 	var fd FormattedData
@@ -120,11 +120,11 @@ func Test_MapSliceFromMustMapFromIndicatedProperties(t *testing.T) {
 		BoolValue   bool
 	}{{
 		IntValue:    982,
-		StringValue: "Some test text.",
+		StringValue: "Some test text",
 		BoolValue:   false,
 	}, {
 		IntValue:    123,
-		StringValue: "Some other text.",
+		StringValue: "Some other text",
 		BoolValue:   false,
 	}}
 
@@ -142,37 +142,37 @@ func Test_MapSliceFromMustMapFromIndicatedProperties(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	s, ok := resource.Values["testSlice"].AsSlice()
+	slice, ok := resource.Values["testSlice"].([]interface{})
 	a.True(ok, "'testSlice' must exist")
 
-	var item1 map[string]ResourceData
-	item1, ok = s[0].AsMap()
+	var item1 ResourceMap
+	item1, ok = slice[0].(ResourceMap)
 	a.True(ok, "'item1' must exist")
 
 	var intValue1 interface{}
-	intValue1, ok = item1["intValue"].AsValue()
+	intValue1, ok = item1.Values["intValue"]
 	a.True(ok, "'intValue1' must exist")
 	a.Equal(982, intValue1, "'intValue1' value must be '982'")
 
 	var stringValue1 interface{}
-	stringValue1, ok = item1["stringValue"].AsValue()
+	stringValue1, ok = item1.Values["stringValue"]
 	a.True(ok, "'stringValue1' must exist")
 	a.Equal("Some test text", stringValue1, "'stringValue1' value must be 'Some test text'")
 
-	_, ok = item1["boolValue"]
+	_, ok = item1.Values["boolValue"]
 	a.False(ok, "'boolValue' must not exist")
 
-	var item2 map[string]ResourceData
-	item2, ok = s[1].AsMap()
+	var item2 ResourceMap
+	item2, ok = slice[1].(ResourceMap)
 	a.True(ok, "'item1' must exist")
 
 	var intValue2 interface{}
-	intValue2, ok = item2["intValue"].AsValue()
+	intValue2, ok = item2.Values["intValue"]
 	a.True(ok, "'intValue2' must exist")
 	a.Equal(123, intValue2, "'intValue2' value must be '123'")
 
 	var stringValue2 interface{}
-	stringValue2, ok = item1["stringValue"].AsValue()
+	stringValue2, ok = item2.Values["stringValue"]
 	a.True(ok, "'stringValue2' must exist")
 	a.Equal("Some other text", stringValue2, "'stringValue2' value must be 'Some other text'")
 }
