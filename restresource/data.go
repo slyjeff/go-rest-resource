@@ -15,20 +15,20 @@ func (r *Resource) FormattedData(name string, value interface{}, callback Format
 	return r
 }
 
-func (rm *resourceMap) addToResourceMap(name string, value interface{}) {
+func (rm *ResourceMap) addToResourceMap(name string, value interface{}) {
 	name = makeCamelCase(name)
 
 	if rm.Values == nil {
-		rm.Values = make(map[string]ResourceData)
+		rm.Values = make(map[string]interface{})
 	}
 
 	rm.Values[name] = createResourceData(value)
 }
 
-func createResourceData(value interface{}) ResourceData {
+func createResourceData(value interface{}) interface{} {
 	_, ok := value.(FormattedData)
 	if ok {
-		return createResourceValue(value)
+		return value
 	}
 
 	switch reflect.TypeOf(value).Kind() {
@@ -37,39 +37,25 @@ func createResourceData(value interface{}) ResourceData {
 	case reflect.Slice, reflect.Array:
 		return createResourceSlice(value)
 	default:
-		return createResourceValue(value)
+		return value
 	}
 }
 
-func createResourceValue(value interface{}) *resourceValue {
-
-	return &resourceValue{value}
-}
-
-func createResourceSlice(value interface{}) *resourceSlice {
-	rs := resourceSlice{
-		[]ResourceData{},
-	}
-
+func createResourceSlice(value interface{}) interface{} {
 	v := reflect.ValueOf(value)
 	l := v.Len()
-	if l == 0 {
-		return &rs
-	}
 
-	values := make([]ResourceData, l)
+	slice := make([]interface{}, l)
 
 	for i := 0; i < l; i++ {
-		values[i] = createResourceData(v.Index(i).Interface())
+		slice[i] = createResourceData(v.Index(i).Interface())
 	}
 
-	rs.Values = values
-
-	return &rs
+	return slice
 }
 
-func createResourceMap(value interface{}) *resourceMap {
-	var rm resourceMap
+func createResourceMap(value interface{}) interface{} {
+	var rm ResourceMap
 
 	t := reflect.TypeOf(value)
 	v := reflect.ValueOf(value)
@@ -77,5 +63,5 @@ func createResourceMap(value interface{}) *resourceMap {
 		rm.addToResourceMap(t.Field(i).Name, v.Field(i).Interface())
 	}
 
-	return &rm
+	return rm
 }

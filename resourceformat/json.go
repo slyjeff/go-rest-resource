@@ -10,16 +10,11 @@ import (
 func ToSlySoftHalJson(r restresource.Resource) string {
 	var valueStrings []string
 	for k, v := range r.Values {
-		value, ok := v.AsValue()
-		if !ok {
-			continue
-		}
-
 		var sValue string
-		if reflect.TypeOf(value).Kind() == reflect.String {
-			sValue = fmt.Sprint("\"", value, "\"")
+		if reflect.TypeOf(v).Kind() == reflect.String {
+			sValue = fmt.Sprint("\"", v, "\"")
 		} else {
-			sValue = fmt.Sprint(value)
+			sValue = fmt.Sprint(v)
 		}
 		valueStrings = append(valueStrings, fmt.Sprintf("  \"%s\":%s", k, sValue))
 	}

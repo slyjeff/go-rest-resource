@@ -1,22 +1,22 @@
 package restresource
 
-import (
-	"golang.org/x/exp/slices"
-	"reflect"
-)
+import "reflect"
 
-type ConfigureMap struct {
-	resource       *Resource
-	source         interface{}
-	excludedFields []string
+type MapFromResource struct {
+	resource *Resource
 }
 
-func (r *Resource) MapAllDataFrom(source interface{}) *Resource {
-	return r.MapDataFrom(source).MapAll().EndMap()
+func (cm *MapFromResource) EndMap() *Resource {
+	return cm.resource
+}
+
+type ConfigureMap struct {
+	MapFromResource
+	source interface{}
 }
 
 func (r *Resource) MapDataFrom(source interface{}) *ConfigureMap {
-	cm := ConfigureMap{r, source, make([]string, 0)}
+	cm := ConfigureMap{MapFromResource{r}, source}
 	return &cm
 }
 
@@ -60,13 +60,46 @@ func (cm *ConfigureMap) Exclude(fieldName string) *ConfigureMap {
 }
 
 func (cm *ConfigureMap) MapFormatted(fieldName string, callback FormatDataCallback) *ConfigureMap {
-	v := reflect.ValueOf(cm.source).FieldByName(fieldName).Interface()
+	v := getValueByName(cm.source, fieldName)
 	fd := FormattedData{v, callback}
 	cm.resource.Data(fieldName, fd)
 
 	return cm
 }
 
-func (cm *ConfigureMap) EndMap() *Resource {
-	return cm.resource
+type ConfigureSliceMap struct {
+	MapFromResource
+	slice  []interface{}
+	source []interface{}
+}
+
+func (r *Resource) MapSliceFrom(fieldName string, source []interface{}) *ConfigureSliceMap {
+	fieldName = makeCamelCase(fieldName)
+
+	slice := make([]interface{}, len(source))
+	for i := range slice {
+		slice[i] = ResourceMap{make(map[string]interface{})}
+	}
+
+	if r.Values == nil {
+		r.Values = make(map[string]interface{})
+	}
+	r.Values[fieldName] = slice
+
+	cm := ConfigureSliceMap{MapFromResource{r}, slice, source}
+	return &cm
+}
+
+func (csm *ConfigureSliceMap) Map(fieldName string) *ConfigureSliceMap {
+	camelCaseFieldName := makeCamelCase(fieldName)
+	for i, v := range csm.source {
+		m, ok := csm.slice[i].(ResourceMap)
+		if !ok {
+			continue
+		}
+
+		m.Values[camelCaseFieldName] = getValueByName(v, fieldName)
+	}
+
+	return csm
 }

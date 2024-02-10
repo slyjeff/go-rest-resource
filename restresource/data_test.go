@@ -16,15 +16,9 @@ func Test_DataMustAddStringToResource(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	value, ok := resource.Values["message"].AsValue()
+	value, ok := resource.Values["message"]
 	a.True(ok, "'message' must exist")
 	a.Equal(message, value, "'message' value must be 'TestMessage'")
-
-	_, ok = resource.Values["message"].AsSlice()
-	a.False(ok, "'message' must not be a slice")
-
-	_, ok = resource.Values["message"].AsMap()
-	a.False(ok, "'message' must not be a map")
 }
 
 func Test_DataNameMustBeCamelCase(t *testing.T) {
@@ -51,7 +45,7 @@ func Test_DataMustStoreInt(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	value, ok := resource.Values["number"].AsValue()
+	value, ok := resource.Values["number"]
 	a.True(ok, "'number' must exist")
 	a.Equal(42, value, "'number' value must be '42'.")
 }
@@ -67,7 +61,7 @@ func Test_FormattedDataAddValueAndFormattingInformation(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	value, ok := resource.Values["number"].AsValue()
+	value, ok := resource.Values["number"]
 	a.True(ok, "'number' must exist")
 
 	var fd FormattedData
@@ -91,12 +85,12 @@ func Test_DataMustBeChainable(t *testing.T) {
 	//assert
 	a := assert.New(t)
 
-	v1, ok := resource.Values["value1"].AsValue()
+	v1, ok := resource.Values["value1"]
 	a.True(ok, "'value1' must exist")
 	a.Equal(37, v1, "'value1' value must be '37'.")
 
 	var v2 interface{}
-	v2, ok = resource.Values["value2"].AsValue()
+	v2, ok = resource.Values["value2"]
 	a.True(ok, "'value2' must exist")
 	a.Equal("Some Text", v2, "'value2' value must be 'Some text'.")
 }
@@ -118,26 +112,20 @@ func Test_DataMustTransformStructToMap(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	testStructAsMap, ok := resource.Values["testStruct"].AsMap()
+	m, ok := resource.Values["testStruct"].(ResourceMap)
 	a.True(ok, "'testStruct' must be found in values.")
 
 	var intValue interface{}
-	intValue, ok = testStructAsMap["intValue"].AsValue()
+	intValue, ok = m.Values["intValue"]
 
 	a.True(ok, "'intValue' must be int 'testStruct'.")
 	a.Equal(982, intValue, "'intValue' value must be '982'.")
 
 	var stringValue interface{}
-	stringValue, ok = testStructAsMap["stringValue"].AsValue()
+	stringValue, ok = m.Values["stringValue"]
 
 	a.True(ok, "'stringValue' must be int 'testStruct'.")
 	a.Equal("Some test text.", stringValue, "'stringValue' value must be 'Some text'.")
-
-	_, ok = resource.Values["testStruct"].AsValue()
-	a.False(ok, "'testStruct' must not be a string")
-
-	_, ok = resource.Values["testStruct"].AsSlice()
-	a.False(ok, "'testStruct' must not be a slice")
 }
 
 func Test_DataMustAddSliceToResource(t *testing.T) {
@@ -150,29 +138,12 @@ func Test_DataMustAddSliceToResource(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	testStrings, ok := resource.Values["strings"].AsSlice()
+	s, ok := resource.Values["strings"].([]interface{})
 	a.True(ok, "'strings' must be found in values.")
 
-	var string1 interface{}
-	string1, ok = testStrings[0].AsValue()
-	a.True(ok, "element 0 must be a string.")
-	a.Equal("text 1", string1, "element 0 must be 'text 1'.")
-
-	var string2 interface{}
-	string2, ok = testStrings[1].AsValue()
-	a.True(ok, "element 1 must be a string.")
-	a.Equal("text 2", string2, "element 1 must be 'text 2'.")
-
-	var string3 interface{}
-	string3, ok = testStrings[2].AsValue()
-	a.True(ok, "element 2 must be a string.")
-	a.Equal("text 3", string3, "element 2 must be 'text 3'.")
-
-	_, ok = resource.Values["strings"].AsValue()
-	a.False(ok, "'strings' must not be a string")
-
-	_, ok = resource.Values["strings"].AsMap()
-	a.False(ok, "'strings' must not be a map")
+	a.Equal("text 1", s[0], "element 0 must be 'text 1'.")
+	a.Equal("text 2", s[1], "element 1 must be 'text 2'.")
+	a.Equal("text 3", s[2], "element 2 must be 'text 3'.")
 }
 
 func Test_DataMustAddArrayToResource(t *testing.T) {
@@ -185,23 +156,12 @@ func Test_DataMustAddArrayToResource(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	testStrings, ok := resource.Values["strings"].AsSlice()
+	s, ok := resource.Values["strings"].([]interface{})
 	a.True(ok, "'strings' must be found in values.")
 
-	var string1 interface{}
-	string1, ok = testStrings[0].AsValue()
-	a.True(ok, "element 0 must be a string.")
-	a.Equal("text 1", string1, "element 0 must be 'text 1'.")
-
-	var string2 interface{}
-	string2, ok = testStrings[1].AsValue()
-	a.True(ok, "element 1 must be a string.")
-	a.Equal("text 2", string2, "element 1 must be 'text 2'.")
-
-	var string3 interface{}
-	string3, ok = testStrings[2].AsValue()
-	a.True(ok, "element 2 must be a string.")
-	a.Equal("text 3", string3, "element 2 must be 'text 3'.")
+	a.Equal("text 1", s[0], "element 0 must be 'text 1'.")
+	a.Equal("text 2", s[1], "element 1 must be 'text 2'.")
+	a.Equal("text 3", s[2], "element 2 must be 'text 3'.")
 }
 
 func Test_DatMustTransformStructsToArraysInSlices(t *testing.T) {
@@ -223,34 +183,34 @@ func Test_DatMustTransformStructsToArraysInSlices(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	testMaps, ok := resource.Values["structs"].AsSlice()
+	slice, ok := resource.Values["structs"].([]interface{})
 	a.True(ok, "'structs' must be found in values.")
 
-	var map1 map[string]ResourceData
-	map1, ok = testMaps[0].AsMap()
-	a.True(ok, "element 0 must be a map.")
+	var map1 ResourceMap
+	map1, ok = slice[0].(ResourceMap)
+	a.True(ok, "element 0 must be a ResourceMap.")
 
 	var intValue1 interface{}
-	intValue1, ok = map1["intValue"].AsValue()
+	intValue1, ok = map1.Values["intValue"]
 	a.True(ok, "'intValue' must be found in first testMap.")
 	a.Equal(43, intValue1, "'intValue' must be '43'.")
 
 	var stringValue1 interface{}
-	stringValue1, ok = map1["stringValue"].AsValue()
+	stringValue1, ok = map1.Values["stringValue"]
 	a.True(ok, "'stringValue' must be found in first testMap.")
 	a.Equal("test 1", stringValue1, "'stringValue' must be 'test 1'.")
 
-	var map2 map[string]ResourceData
-	map2, ok = testMaps[1].AsMap()
+	var map2 ResourceMap
+	map2, ok = slice[1].(ResourceMap)
 	a.True(ok, "element 1 must be a map.")
 
 	var intValue2 interface{}
-	intValue2, ok = map2["intValue"].AsValue()
+	intValue2, ok = map2.Values["intValue"]
 	a.True(ok, "'intValue' must be found in second testMap.")
 	a.Equal(367, intValue2, "'intValue' must be '367'.")
 
 	var stringValue2 interface{}
-	stringValue2, ok = map2["stringValue"].AsValue()
+	stringValue2, ok = map2.Values["stringValue"]
 	a.True(ok, "'stringValue' must be found in second testMap.")
 	a.Equal("test 2", stringValue2, "'stringValue' must be 'test 2'.")
 }

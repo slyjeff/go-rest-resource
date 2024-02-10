@@ -1,6 +1,7 @@
 package restresource
 
 import (
+	"reflect"
 	"unicode"
 	"unicode/utf8"
 )
@@ -17,4 +18,8 @@ func makeCamelCase(s string) string {
 	}
 
 	return string(lc) + s[size:]
+}
+
+func getValueByName(source interface{}, fieldName string) interface{} {
+	return reflect.ValueOf(source).FieldByName(fieldName).Interface()
 }
