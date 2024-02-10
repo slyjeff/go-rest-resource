@@ -42,7 +42,6 @@ func createResourceData(value interface{}) ResourceData {
 }
 
 func createResourceValue(value interface{}) *resourceValue {
-
 	return &resourceValue{value}
 }
 

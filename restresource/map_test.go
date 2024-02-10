@@ -109,5 +109,70 @@ func Test_MapDataFromMustAddFormattedData(t *testing.T) {
 	a.True(ok, "'floatValue' must be of type formatted data")
 
 	a.Equal(982.4332, fd.Value, "'floatValue' value must be '4234.3982'.")
-	a.Equal("982.43", fd.FormattedString(), "'floatValue' value  formatted as string correctly.")
+	a.Equal("982.43", fd.FormattedString(), "'floatValue' value  frmatted as string correctly.")
+}
+
+func Test_MapSliceFromMustMapFromIndicatedProperties(t *testing.T) {
+	//arrange
+	values := []struct {
+		IntValue    int
+		StringValue string
+		BoolValue   bool
+	}{{
+		IntValue:    982,
+		StringValue: "Some test text.",
+		BoolValue:   false,
+	}, {
+		IntValue:    123,
+		StringValue: "Some other text.",
+		BoolValue:   false,
+	}}
+
+	testSlice := make([]interface{}, len(values))
+	for i, v := range values {
+		testSlice[i] = v
+	}
+
+	var resource Resource
+
+	//act
+	resource.MapSliceFrom("testSlice", testSlice).
+		Map("IntValue").
+		Map("StringValue")
+
+	//assert
+	a := assert.New(t)
+	s, ok := resource.Values["testSlice"].AsSlice()
+	a.True(ok, "'testSlice' must exist")
+
+	var item1 map[string]ResourceData
+	item1, ok = s[0].AsMap()
+	a.True(ok, "'item1' must exist")
+
+	var intValue1 interface{}
+	intValue1, ok = item1["intValue"].AsValue()
+	a.True(ok, "'intValue1' must exist")
+	a.Equal(982, intValue1, "'intValue1' value must be '982'")
+
+	var stringValue1 interface{}
+	stringValue1, ok = item1["stringValue"].AsValue()
+	a.True(ok, "'stringValue1' must exist")
+	a.Equal("Some test text", stringValue1, "'stringValue1' value must be 'Some test text'")
+
+	_, ok = item1["boolValue"]
+	a.False(ok, "'boolValue' must not exist")
+
+	var item2 map[string]ResourceData
+	item2, ok = s[1].AsMap()
+	a.True(ok, "'item1' must exist")
+
+	var intValue2 interface{}
+	intValue2, ok = item2["intValue"].AsValue()
+	a.True(ok, "'intValue2' must exist")
+	a.Equal(123, intValue2, "'intValue2' value must be '123'")
+
+	var stringValue2 interface{}
+	stringValue2, ok = item1["stringValue"].AsValue()
+	a.True(ok, "'stringValue2' must exist")
+	a.Equal("Some other text", stringValue2, "'stringValue2' value must be 'Some other text'")
 }
