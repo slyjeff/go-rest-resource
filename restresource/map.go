@@ -1,6 +1,9 @@
 package restresource
 
-import "reflect"
+import (
+	"golang.org/x/exp/slices"
+	"reflect"
+)
 
 type MapFromResource struct {
 	resource *Resource
@@ -12,11 +15,16 @@ func (cm *MapFromResource) EndMap() *Resource {
 
 type ConfigureMap struct {
 	MapFromResource
-	source interface{}
+	source         interface{}
+	excludedFields []string
+}
+
+func (r *Resource) MapAllDataFrom(source interface{}) *Resource {
+	return r.MapDataFrom(source).MapAll().EndMap()
 }
 
 func (r *Resource) MapDataFrom(source interface{}) *ConfigureMap {
-	cm := ConfigureMap{MapFromResource{r}, source}
+	cm := ConfigureMap{MapFromResource{r}, source, make([]string, 0)}
 	return &cm
 }
 

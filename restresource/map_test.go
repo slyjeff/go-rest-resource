@@ -196,17 +196,17 @@ func Test_MapDataFromMustSupportMapAll(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	intValue, ok := resource.Values["intValue"].AsValue()
+	intValue, ok := resource.Values["intValue"]
 	a.True(ok, "'intValue' must exist")
 	a.Equal(982, intValue, "'intValue' value must be '982'")
 
 	var stringValue interface{}
-	stringValue, ok = resource.Values["stringValue"].AsValue()
+	stringValue, ok = resource.Values["stringValue"]
 	a.True(ok, "'stringValue' must exist")
 	a.Equal("Some test text.", stringValue, "'stringValue' value must be 'Some test text'.")
 
 	var boolValue interface{}
-	boolValue, ok = resource.Values["boolValue"].AsValue()
+	boolValue, ok = resource.Values["boolValue"]
 	a.True(ok, "'boolValue' must exist")
 	a.Equal(false, boolValue, "'boolValue' value must be false.")
 }
@@ -234,7 +234,7 @@ func Test_MapAllMustNotOverwriteFormattedString(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	value, _ := resource.Values["floatValue"].AsValue()
+	value, _ := resource.Values["floatValue"]
 	var fd FormattedData
 	fd, _ = value.(FormattedData)
 	a.Equal("982.44", fd.FormattedString(), "'floatValue' value  formatted as string correctly.")
@@ -292,17 +292,17 @@ func Test_MapAllDataFromMustNotRequireEndMap(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	intValue, ok := resource.Values["intValue"].AsValue()
+	intValue, ok := resource.Values["intValue"]
 	a.True(ok, "'intValue' must exist")
 	a.Equal(982, intValue, "'intValue' value must be '982'")
 
 	var stringValue interface{}
-	stringValue, ok = resource.Values["stringValue"].AsValue()
+	stringValue, ok = resource.Values["stringValue"]
 	a.True(ok, "'stringValue' must exist")
 	a.Equal("Some test text.", stringValue, "'stringValue' value must be 'Some test text'.")
 
 	var boolValue interface{}
-	boolValue, ok = resource.Values["boolValue"].AsValue()
+	boolValue, ok = resource.Values["boolValue"]
 	a.True(ok, "'boolValue' must exist")
 	a.Equal(false, boolValue, "'boolValue' value must be false.")
 }
