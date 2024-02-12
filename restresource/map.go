@@ -29,7 +29,21 @@ func (r *Resource) MapDataFrom(source interface{}) *ConfigureMap {
 }
 
 func (cm *ConfigureMap) Map(fieldName string) *ConfigureMap {
-	v := reflect.ValueOf(cm.source).FieldByName(fieldName).Interface()
+	cm.MapWithOptions(fieldName, MapOptions{})
+
+	return cm
+}
+
+func (cm *ConfigureMap) MapWithOptions(fieldName string, mapOptions MapOptions) *ConfigureMap {
+	v := getValueByName(cm.source, fieldName)
+
+	if mapOptions.Name != "" {
+		fieldName = mapOptions.Name
+	}
+
+	if mapOptions.FormatCallback != nil {
+		v = FormattedData{v, mapOptions.FormatCallback}
+	}
 
 	cm.resource.Data(fieldName, v)
 
@@ -72,22 +86,6 @@ type MapOptions struct {
 	FormatCallback FormatDataCallback
 }
 
-func (cm *ConfigureMap) MapWithOptions(fieldName string, mapOptions MapOptions) *ConfigureMap {
-	v := getValueByName(cm.source, fieldName)
-
-	if mapOptions.Name != "" {
-		fieldName = mapOptions.Name
-	}
-
-	if mapOptions.FormatCallback != nil {
-		v = FormattedData{v, mapOptions.FormatCallback}
-	}
-
-	cm.resource.Data(fieldName, v)
-
-	return cm
-}
-
 type ConfigureSliceMap struct {
 	MapFromResource
 	slice  []interface{}
@@ -112,14 +110,31 @@ func (r *Resource) MapSliceFrom(fieldName string, source []interface{}) *Configu
 }
 
 func (csm *ConfigureSliceMap) Map(fieldName string) *ConfigureSliceMap {
-	camelCaseFieldName := makeCamelCase(fieldName)
+	csm.MapWithOptions(fieldName, MapOptions{})
+
+	return csm
+}
+
+func (csm *ConfigureSliceMap) MapWithOptions(fieldName string, mapOptions MapOptions) *ConfigureSliceMap {
+	var name string
+	if mapOptions.Name == "" {
+		name = makeCamelCase(fieldName)
+	} else {
+		name = makeCamelCase(mapOptions.Name)
+	}
+
 	for i, v := range csm.source {
 		m, ok := csm.slice[i].(ResourceMap)
 		if !ok {
 			continue
 		}
 
-		m.Values[camelCaseFieldName] = getValueByName(v, fieldName)
+		value := getValueByName(v, fieldName)
+		if mapOptions.FormatCallback != nil {
+			value = FormattedData{value, mapOptions.FormatCallback}
+		}
+
+		m.Values[name] = value
 	}
 
 	return csm

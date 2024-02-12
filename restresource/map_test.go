@@ -109,7 +109,7 @@ func Test_MapDataFromSupportFormattedData(t *testing.T) {
 	a.True(ok, "'floatValue' must be of type formatted data")
 
 	a.Equal(982.4332, fd.Value, "'floatValue' value must be '4234.3982'.")
-	a.Equal("982.43", fd.FormattedString(), "'floatValue' value  frmatted as string correctly.")
+	a.Equal("982.43", fd.FormattedString(), "'floatValue' value  formatted as string correctly.")
 }
 
 func Test_MapDataFromSupportRenaming(t *testing.T) {
@@ -202,17 +202,9 @@ func Test_MapSliceFromMustMapFromIndicatedProperties(t *testing.T) {
 func Test_MapSliceMustAllowRenaming(t *testing.T) {
 	//arrange
 	values := []struct {
-		IntValue    int
-		StringValue string
-		BoolValue   bool
+		IntValue int
 	}{{
-		IntValue:    982,
-		StringValue: "Some test text",
-		BoolValue:   false,
-	}, {
-		IntValue:    123,
-		StringValue: "Some other text",
-		BoolValue:   false,
+		IntValue: 13,
 	}}
 
 	testSlice := make([]interface{}, len(values))
@@ -224,8 +216,7 @@ func Test_MapSliceMustAllowRenaming(t *testing.T) {
 
 	//act
 	resource.MapSliceFrom("testSlice", testSlice).
-		Map("IntValue").
-		Map("StringValue")
+		MapWithOptions("IntValue", MapOptions{Name: "age"})
 
 	//assert
 	a := assert.New(t)
@@ -237,31 +228,52 @@ func Test_MapSliceMustAllowRenaming(t *testing.T) {
 	a.True(ok, "'item1' must exist")
 
 	var intValue1 interface{}
-	intValue1, ok = item1.Values["intValue"]
-	a.True(ok, "'intValue1' must exist")
-	a.Equal(982, intValue1, "'intValue1' value must be '982'")
+	intValue1, ok = item1.Values["age"]
+	a.True(ok, "'age' must exist")
+	a.Equal(13, intValue1, "'age' value must be '13'")
+}
 
-	var stringValue1 interface{}
-	stringValue1, ok = item1.Values["stringValue"]
-	a.True(ok, "'stringValue1' must exist")
-	a.Equal("Some test text", stringValue1, "'stringValue1' value must be 'Some test text'")
+func Test_MapSliceMustAllowFormatting(t *testing.T) {
+	//arrange
+	values := []struct {
+		FloatValue float64
+	}{{
+		FloatValue: 53.255,
+	}}
 
-	_, ok = item1.Values["boolValue"]
-	a.False(ok, "'boolValue' must not exist")
+	testSlice := make([]interface{}, len(values))
+	for i, v := range values {
+		testSlice[i] = v
+	}
 
-	var item2 ResourceMap
-	item2, ok = slice[1].(ResourceMap)
+	var resource Resource
+
+	formatToTwoDecimals := func(v interface{}) string { return fmt.Sprintf("%.02f", v) }
+
+	//act
+	resource.MapSliceFrom("testSlice", testSlice).
+		MapWithOptions("FloatValue", MapOptions{FormatCallback: formatToTwoDecimals})
+
+	//assert
+	a := assert.New(t)
+	slice, ok := resource.Values["testSlice"].([]interface{})
+	a.True(ok, "'testSlice' must exist")
+
+	var item1 ResourceMap
+	item1, ok = slice[0].(ResourceMap)
 	a.True(ok, "'item1' must exist")
 
-	var intValue2 interface{}
-	intValue2, ok = item2.Values["intValue"]
-	a.True(ok, "'intValue2' must exist")
-	a.Equal(123, intValue2, "'intValue2' value must be '123'")
+	var floatValue interface{}
+	floatValue, ok = item1.Values["floatValue"]
+	a.True(ok, "'floatValue' must exist")
 
-	var stringValue2 interface{}
-	stringValue2, ok = item2.Values["stringValue"]
-	a.True(ok, "'stringValue2' must exist")
-	a.Equal("Some other text", stringValue2, "'stringValue2' value must be 'Some other text'")
+	var fd FormattedData
+	fd, ok = floatValue.(FormattedData)
+	a.True(ok, "'floatValue' must be of type formatted data")
+
+	a.Equal(53.255, fd.Value, "'floatValue' value must be '4234.3982'.")
+	a.Equal("53.26", fd.FormattedString(), "'floatValue' value formatted as string correctly.")
+
 }
 
 func Test_MapDataFromMustSupportMapAll(t *testing.T) {
