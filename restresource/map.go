@@ -67,10 +67,23 @@ func (cm *ConfigureMap) Exclude(fieldName string) *ConfigureMap {
 	return cm
 }
 
-func (cm *ConfigureMap) MapFormatted(fieldName string, callback FormatDataCallback) *ConfigureMap {
+type MapOptions struct {
+	Name           string
+	FormatCallback FormatDataCallback
+}
+
+func (cm *ConfigureMap) MapWithOptions(fieldName string, mapOptions MapOptions) *ConfigureMap {
 	v := getValueByName(cm.source, fieldName)
-	fd := FormattedData{v, callback}
-	cm.resource.Data(fieldName, fd)
+
+	if mapOptions.Name != "" {
+		fieldName = mapOptions.Name
+	}
+
+	if mapOptions.FormatCallback != nil {
+		v = FormattedData{v, mapOptions.FormatCallback}
+	}
+
+	cm.resource.Data(fieldName, v)
 
 	return cm
 }
