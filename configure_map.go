@@ -6,18 +6,17 @@ import (
 )
 
 type ConfigureMap struct {
-	MapFromResource
-	source interface{}
+	*ResourceMap
+	source         interface{}
+	excludedFields []string
 }
 
-func (cm *ConfigureMap) Map(fieldName string) *ConfigureMap {
-	cm.MapWithOptions(fieldName, MapOptions{})
-
-	return cm
+func newConfigureMap(rm *ResourceMap, source interface{}) ConfigureMap {
+	return ConfigureMap{rm, source, make([]string, 0)}
 }
 
-func (cm *ConfigureMap) MapWithOptions(fieldName string, mapOptions MapOptions) *ConfigureMap {
-	v := getValueByName(cm.source, fieldName)
+func (configuration *ConfigureMap) mapWithOptions(fieldName string, mapOptions MapOptions) {
+	v := getValueByName(configuration.source, fieldName)
 	v = createResourceData(v)
 
 	if mapOptions.Name != "" {
@@ -28,18 +27,16 @@ func (cm *ConfigureMap) MapWithOptions(fieldName string, mapOptions MapOptions) 
 		v = FormattedData{v, mapOptions.FormatCallback}
 	}
 
-	if cm.resource.Values == nil {
-		cm.resource.Values = make(map[string]interface{})
+	if configuration.Values == nil {
+		configuration.Values = make(map[string]interface{})
 	}
 
 	name := makeCamelCase(fieldName)
-	cm.resource.Values[name] = v
-
-	return cm
+	configuration.Values[name] = v
 }
 
-func (cm *ConfigureMap) MapChild(fieldName string) ConfigureChildMap {
-	source, ok := getValueByName(cm.source, fieldName).([]interface{})
+func (configuration *ConfigureMap) mapChild(fieldName string) ([]ResourceMap, []interface{}) {
+	source, ok := getValueByName(configuration.source, fieldName).([]interface{})
 	if !ok {
 		source = make([]interface{}, 0)
 	}
@@ -49,42 +46,66 @@ func (cm *ConfigureMap) MapChild(fieldName string) ConfigureChildMap {
 		slice[i] = ResourceMap{make(map[string]interface{})}
 	}
 
-	if cm.resource.Values == nil {
-		cm.resource.Values = make(map[string]interface{})
+	if configuration.Values == nil {
+		configuration.Values = make(map[string]interface{})
 	}
 
 	fieldName = makeCamelCase(fieldName)
-	cm.resource.Values[fieldName] = slice
+	configuration.Values[fieldName] = slice
 
-	mapFromResource := newMapFromResource(cm.resource)
-	ccm := ConfigureChildSliceMap{&mapFromResource, configureSlice{slice, source}, cm}
-	return &ccm
+	return slice, source
 }
 
-func (cm *ConfigureMap) MapAll() *ConfigureMap {
-	t := reflect.TypeOf(cm.source)
-	v := reflect.ValueOf(cm.source)
+func (configuration *ConfigureMap) excludeField(fieldName string) {
+	fieldName = makeCamelCase(fieldName)
+	configuration.excludedFields = append(configuration.excludedFields, fieldName)
+
+	delete(configuration.Values, fieldName)
+}
+
+func (configuration *ConfigureMap) mapAll() {
+	t := reflect.TypeOf(configuration.source)
+	v := reflect.ValueOf(configuration.source)
 
 	for i := 0; i < t.NumField(); i++ {
 		fieldName := makeCamelCase(t.Field(i).Name)
 
-		if slices.Contains(cm.excludedFields, fieldName) {
+		if slices.Contains(configuration.excludedFields, fieldName) {
 			continue
 		}
 
-		if _, ok := cm.resource.Values[fieldName]; ok {
+		if _, ok := configuration.Values[fieldName]; ok {
 			continue
 		}
 
-		value := v.Field(i).Interface()
-		cm.resource.Data(fieldName, value)
+		if configuration.Values == nil {
+			configuration.Values = make(map[string]interface{})
+		}
+
+		v := v.Field(i).Interface()
+		name := makeCamelCase(fieldName)
+		configuration.Values[name] = v
 	}
-
-	return cm
 }
 
-func (cm *ConfigureMap) Exclude(fieldName string) *ConfigureMap {
-	cm.excludeField(fieldName)
+func (configuration *ConfigureMap) Map(fieldName string) *ConfigureMap {
+	configuration.MapWithOptions(fieldName, MapOptions{})
+	return configuration
+}
 
-	return cm
+func (configuration *ConfigureMap) MapWithOptions(fieldName string, mapOptions MapOptions) *ConfigureMap {
+	configuration.MapWithOptions(fieldName, mapOptions)
+	return configuration
+}
+
+func (configuration *ConfigureMap) MapAll() *ConfigureMap {
+	configuration.mapAll()
+
+	return configuration
+}
+
+func (configuration *ConfigureMap) Exclude(fieldName string) *ConfigureMap {
+	configuration.excludeField(fieldName)
+
+	return configuration
 }

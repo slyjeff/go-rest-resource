@@ -686,7 +686,7 @@ func Test_MustBeAbleToMapSliceByFieldWhenMappingAStruct(t *testing.T) {
 	//assert
 	a := assert.New(t)
 	slice, ok := resource.Values["slice"].([]ResourceMap)
-	a.True(ok, "'testSlice' must exist")
+	a.True(ok, "'slice' must exist")
 
 	var intValue1 interface{}
 	intValue1, ok = slice[0].Values["intValue"]
@@ -707,4 +707,85 @@ func Test_MustBeAbleToMapSliceByFieldWhenMappingAStruct(t *testing.T) {
 	stringValue2, ok = slice[1].Values["stringValue"]
 	a.True(ok, "'stringValue2' must exist")
 	a.Equal("Some other text", stringValue2, "'stringValue2' value must be 'Some other text'")
+}
+
+func Test_MustBeAbleToRenameWhenMappingAChild(t *testing.T) {
+	//arrange
+	values := []struct {
+		IntValue int
+	}{{
+		IntValue: 45,
+	}}
+
+	testStruct := struct {
+		Slice []interface{}
+	}{
+		Slice: make([]interface{}, len(values)),
+	}
+
+	for i, v := range values {
+		testStruct.Slice[i] = v
+	}
+
+	var resource Resource
+
+	//act
+	resource.MapDataFrom(testStruct).
+		MapChild("Slice").
+		MapWithOptions("IntValue", MapOptions{Name: "age"})
+
+	//assert
+	a := assert.New(t)
+	slice, ok := resource.Values["slice"].([]ResourceMap)
+	a.True(ok, "'slice' must exist")
+
+	var intValue1 interface{}
+	intValue1, ok = slice[0].Values["age"]
+	a.True(ok, "'age' must exist")
+	a.Equal(45, intValue1, "'age' value must be '45'")
+}
+
+func Test_MustBeAbleToMapAllWhenMappingAChildSlice(t *testing.T) {
+	//arrange
+	values := []struct {
+		StringValue string
+		IntValue    int
+	}{{
+		StringValue: "test text",
+		IntValue:    45,
+	}}
+
+	testStruct := struct {
+		Slice []interface{}
+	}{
+		Slice: make([]interface{}, len(values)),
+	}
+
+	for i, v := range values {
+		testStruct.Slice[i] = v
+	}
+
+	var resource Resource
+
+	//act
+	resource.MapDataFrom(testStruct).
+		MapChild("Slice").
+		MapAll().
+		EndMap().
+		EndMap()
+
+	//assert
+	a := assert.New(t)
+	slice, ok := resource.Values["slice"].([]ResourceMap)
+	a.True(ok, "'slice' must exist")
+
+	var stringValue interface{}
+	stringValue, ok = slice[0].Values["stringValue"]
+	a.True(ok, "'age' must exist")
+	a.Equal("test text", stringValue, "'age' value must be 'test text'")
+
+	var intValue interface{}
+	intValue, ok = slice[0].Values["intValue"]
+	a.True(ok, "'age' must exist")
+	a.Equal(45, intValue, "'age' value must be '45'")
 }
