@@ -18,6 +18,7 @@ func (cm *ConfigureMap) Map(fieldName string) *ConfigureMap {
 
 func (cm *ConfigureMap) MapWithOptions(fieldName string, mapOptions MapOptions) *ConfigureMap {
 	v := getValueByName(cm.source, fieldName)
+	v = createResourceData(v)
 
 	if mapOptions.Name != "" {
 		fieldName = mapOptions.Name
@@ -27,7 +28,12 @@ func (cm *ConfigureMap) MapWithOptions(fieldName string, mapOptions MapOptions) 
 		v = FormattedData{v, mapOptions.FormatCallback}
 	}
 
-	cm.resource.Data(fieldName, v)
+	if cm.resource.Values == nil {
+		cm.resource.Values = make(map[string]interface{})
+	}
+
+	name := makeCamelCase(fieldName)
+	cm.resource.Values[name] = v
 
 	return cm
 }

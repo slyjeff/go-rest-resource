@@ -45,6 +45,21 @@ func createResourceSlice(value interface{}) interface{} {
 	v := reflect.ValueOf(value)
 	l := v.Len()
 
+	if l == 0 {
+		return make([]interface{}, 0)
+	}
+
+	firstItem := v.Index(0).Interface()
+	if reflect.TypeOf(firstItem).Kind() == reflect.Struct {
+		slice := make([]ResourceMap, l)
+
+		for i := 0; i < l; i++ {
+			slice[i] = createResourceMap(v.Index(i).Interface())
+		}
+
+		return slice
+	}
+
 	slice := make([]interface{}, l)
 
 	for i := 0; i < l; i++ {
@@ -54,7 +69,7 @@ func createResourceSlice(value interface{}) interface{} {
 	return slice
 }
 
-func createResourceMap(value interface{}) interface{} {
+func createResourceMap(value interface{}) ResourceMap {
 	var rm ResourceMap
 
 	t := reflect.TypeOf(value)

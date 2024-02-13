@@ -26,6 +26,7 @@ func (configuration configureSlice) mapWithOptions(fieldName string, mapOptions 
 		m := configuration.slice[i]
 
 		value := getValueByName(v, fieldName)
+		value = createResourceData(value)
 		if mapOptions.FormatCallback != nil {
 			value = FormattedData{value, mapOptions.FormatCallback}
 		}

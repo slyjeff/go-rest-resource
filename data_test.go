@@ -164,7 +164,7 @@ func Test_DataMustAddArrayToResource(t *testing.T) {
 	a.Equal("text 3", s[2], "element 2 must be 'text 3'.")
 }
 
-func Test_DatMustTransformStructsToArraysInSlices(t *testing.T) {
+func Test_DatMustTransformStructsToResourceMapsInSlices(t *testing.T) {
 	//arrange
 	type testStruct struct {
 		IntValue    int
@@ -183,34 +183,26 @@ func Test_DatMustTransformStructsToArraysInSlices(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	slice, ok := resource.Values["structs"].([]interface{})
+	slice, ok := resource.Values["structs"].([]ResourceMap)
 	a.True(ok, "'structs' must be found in values.")
 
-	var map1 ResourceMap
-	map1, ok = slice[0].(ResourceMap)
-	a.True(ok, "element 0 must be a ResourceMap.")
-
 	var intValue1 interface{}
-	intValue1, ok = map1.Values["intValue"]
+	intValue1, ok = slice[0].Values["intValue"]
 	a.True(ok, "'intValue' must be found in first testMap.")
 	a.Equal(43, intValue1, "'intValue' must be '43'.")
 
 	var stringValue1 interface{}
-	stringValue1, ok = map1.Values["stringValue"]
+	stringValue1, ok = slice[0].Values["stringValue"]
 	a.True(ok, "'stringValue' must be found in first testMap.")
 	a.Equal("test 1", stringValue1, "'stringValue' must be 'test 1'.")
 
-	var map2 ResourceMap
-	map2, ok = slice[1].(ResourceMap)
-	a.True(ok, "element 1 must be a map.")
-
 	var intValue2 interface{}
-	intValue2, ok = map2.Values["intValue"]
+	intValue2, ok = slice[1].Values["intValue"]
 	a.True(ok, "'intValue' must be found in second testMap.")
 	a.Equal(367, intValue2, "'intValue' must be '367'.")
 
 	var stringValue2 interface{}
-	stringValue2, ok = map2.Values["stringValue"]
+	stringValue2, ok = slice[1].Values["stringValue"]
 	a.True(ok, "'stringValue' must be found in second testMap.")
 	a.Equal("test 2", stringValue2, "'stringValue' must be 'test 2'.")
 }

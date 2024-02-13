@@ -582,7 +582,69 @@ func Test_MapAllFromSliceMustNotRequireEndMap(t *testing.T) {
 	a.Equal(false, boolValue, "'boolValue' value must be false.")
 }
 
-func Test_MustBeAbleToMapSliceWhenMappingAStruct(t *testing.T) {
+func Test_MustBeAbleToMapSliceMappingAStruct(t *testing.T) {
+	//arrange
+	values := []struct {
+		IntValue    int
+		StringValue string
+	}{{
+		IntValue:    982,
+		StringValue: "Some test text",
+	}, {
+		IntValue:    123,
+		StringValue: "Some other text",
+	}}
+
+	testStruct := struct {
+		StringValue string
+		IntValue    int
+		Slice       []interface{}
+	}{
+		StringValue: "Hi there",
+		IntValue:    9382,
+		Slice:       make([]interface{}, len(values)),
+	}
+
+	for i, v := range values {
+		testStruct.Slice[i] = v
+	}
+
+	var resource Resource
+
+	//act
+	resource.MapDataFrom(testStruct).
+		Map("StringValue").
+		Map("IntValue").
+		Map("Slice").
+		EndMap()
+
+	//assert
+	a := assert.New(t)
+	slice, ok := resource.Values["slice"].([]ResourceMap)
+	a.True(ok, "'testSlice' must exist")
+
+	var intValue1 interface{}
+	intValue1, ok = slice[0].Values["intValue"]
+	a.True(ok, "'intValue1' must exist")
+	a.Equal(982, intValue1, "'intValue1' value must be '982'")
+
+	var stringValue1 interface{}
+	stringValue1, ok = slice[0].Values["stringValue"]
+	a.True(ok, "'stringValue1' must exist")
+	a.Equal("Some test text", stringValue1, "'stringValue1' value must be 'Some test text'")
+
+	var intValue2 interface{}
+	intValue2, ok = slice[1].Values["intValue"]
+	a.True(ok, "'intValue2' must exist")
+	a.Equal(123, intValue2, "'intValue2' value must be '123'")
+
+	var stringValue2 interface{}
+	stringValue2, ok = slice[1].Values["stringValue"]
+	a.True(ok, "'stringValue2' must exist")
+	a.Equal("Some other text", stringValue2, "'stringValue2' value must be 'Some other text'")
+}
+
+func Test_MustBeAbleToMapSliceByFieldWhenMappingAStruct(t *testing.T) {
 	//arrange
 	values := []struct {
 		IntValue    int
