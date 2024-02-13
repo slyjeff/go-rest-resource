@@ -6,17 +6,28 @@ import (
 )
 
 type MapFromResource struct {
-	resource *Resource
+	resource       *Resource
+	excludedFields []string
 }
 
-func (cm *MapFromResource) EndMap() *Resource {
-	return cm.resource
+func NewMapFromResource(r *Resource) MapFromResource {
+	return MapFromResource{r, make([]string, 0)}
+}
+
+func (mfr *MapFromResource) excludeField(fieldName string) {
+	fieldName = makeCamelCase(fieldName)
+	mfr.excludedFields = append(mfr.excludedFields, fieldName)
+
+	delete(mfr.resource.Values, fieldName)
+}
+
+func (mfr *MapFromResource) EndMap() *Resource {
+	return mfr.resource
 }
 
 type ConfigureMap struct {
 	MapFromResource
-	source         interface{}
-	excludedFields []string
+	source interface{}
 }
 
 func (r *Resource) MapAllDataFrom(source interface{}) *Resource {
@@ -24,7 +35,7 @@ func (r *Resource) MapAllDataFrom(source interface{}) *Resource {
 }
 
 func (r *Resource) MapDataFrom(source interface{}) *ConfigureMap {
-	cm := ConfigureMap{MapFromResource{r}, source, make([]string, 0)}
+	cm := ConfigureMap{NewMapFromResource(r), source}
 	return &cm
 }
 
@@ -73,10 +84,7 @@ func (cm *ConfigureMap) MapAll() *ConfigureMap {
 }
 
 func (cm *ConfigureMap) Exclude(fieldName string) *ConfigureMap {
-	fieldName = makeCamelCase(fieldName)
-	cm.excludedFields = append(cm.excludedFields, fieldName)
-
-	delete(cm.resource.Values, fieldName)
+	cm.excludeField(fieldName)
 
 	return cm
 }
@@ -92,7 +100,11 @@ type ConfigureSliceMap struct {
 	source []interface{}
 }
 
-func (r *Resource) MapSliceFrom(fieldName string, source []interface{}) *ConfigureSliceMap {
+func (r *Resource) MapAllDataFromSlice(fieldName string, source []interface{}) *Resource {
+	return r.MapFromSlice(fieldName, source).MapAll().EndMap()
+}
+
+func (r *Resource) MapFromSlice(fieldName string, source []interface{}) *ConfigureSliceMap {
 	fieldName = makeCamelCase(fieldName)
 
 	slice := make([]interface{}, len(source))
@@ -105,7 +117,7 @@ func (r *Resource) MapSliceFrom(fieldName string, source []interface{}) *Configu
 	}
 	r.Values[fieldName] = slice
 
-	cm := ConfigureSliceMap{MapFromResource{r}, slice, source}
+	cm := ConfigureSliceMap{NewMapFromResource(r), slice, source}
 	return &cm
 }
 
@@ -116,6 +128,10 @@ func (csm *ConfigureSliceMap) Map(fieldName string) *ConfigureSliceMap {
 }
 
 func (csm *ConfigureSliceMap) MapWithOptions(fieldName string, mapOptions MapOptions) *ConfigureSliceMap {
+	if len(csm.source) == 0 {
+		return csm
+	}
+
 	var name string
 	if mapOptions.Name == "" {
 		name = makeCamelCase(fieldName)
@@ -136,6 +152,33 @@ func (csm *ConfigureSliceMap) MapWithOptions(fieldName string, mapOptions MapOpt
 
 		m.Values[name] = value
 	}
+
+	return csm
+}
+
+func (csm *ConfigureSliceMap) MapAll() *ConfigureSliceMap {
+	if len(csm.source) == 0 {
+		return csm
+	}
+
+	firstItem := csm.source[0]
+
+	t := reflect.TypeOf(firstItem)
+
+	for i := 0; i < t.NumField(); i++ {
+		var fieldName = makeCamelCase(t.Field(i).Name)
+		if slices.Contains(csm.excludedFields, fieldName) {
+			continue
+		}
+
+		csm.Map(t.Field(i).Name)
+	}
+
+	return csm
+}
+
+func (csm *ConfigureSliceMap) Exclude(fieldName string) *ConfigureSliceMap {
+	csm.excludeField(fieldName)
 
 	return csm
 }
