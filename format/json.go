@@ -1,13 +1,13 @@
-package resourceformat
+package format
 
 import (
 	"fmt"
 	"reflect"
-	"restresource/restresource"
+	"restresource"
 	"strings"
 )
 
-func ToSlySoftHalJson(r restresource.Resource) string {
+func ToSlySoftHalJson(r GoRestResource.Resource) string {
 	var valueStrings []string
 	for k, v := range r.Values {
 		var sValue string

@@ -1,4 +1,4 @@
-package restresource
+package GoRestResource
 
 type FormatDataCallback func(v interface{}) string
 

@@ -1,8 +1,8 @@
-package resourceformat
+package format
 
 import (
 	"github.com/stretchr/testify/assert"
-	"restresource/restresource"
+	"restresource"
 	"testing"
 )
 
@@ -11,7 +11,7 @@ func Test_DataMustAddStringToResource(t *testing.T) {
 	stringValue := "I am a string"
 	intValue := 938
 
-	var resource restresource.Resource
+	var resource GoRestResource.Resource
 	resource.
 		Data("stringValue", stringValue).
 		Data("intValue", intValue)

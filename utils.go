@@ -1,4 +1,4 @@
-package restresource
+package GoRestResource
 
 import (
 	"reflect"
