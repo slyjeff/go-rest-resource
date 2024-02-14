@@ -288,13 +288,13 @@ func Test_MapFromSliceMustMapFromIndicatedProperties(t *testing.T) {
 	var resource Resource
 
 	//act
-	resource.MapFromSlice("testSlice", testSlice).
+	resource.MapChild("testSlice", testSlice).
 		Map("IntValue").
 		Map("StringValue")
 
 	//assert
 	a := assert.New(t)
-	slice, ok := resource.Values["testSlice"].([]ResourceMap)
+	slice, ok := resource.Values["testSlice"].([]ResourceData)
 	a.True(ok, "'testSlice' must exist")
 
 	var intValue1 interface{}
@@ -337,12 +337,12 @@ func Test_MapFromSliceMustAllowRenaming(t *testing.T) {
 	var resource Resource
 
 	//act
-	resource.MapFromSlice("testSlice", testSlice).
+	resource.MapChild("testSlice", testSlice).
 		MapWithOptions("IntValue", MapOptions{Name: "age"})
 
 	//assert
 	a := assert.New(t)
-	slice, ok := resource.Values["testSlice"].([]ResourceMap)
+	slice, ok := resource.Values["testSlice"].([]ResourceData)
 	a.True(ok, "'testSlice' must exist")
 
 	var intValue1 interface{}
@@ -369,12 +369,12 @@ func Test_MapFromSliceMustAllowFormatting(t *testing.T) {
 	formatToTwoDecimals := func(v interface{}) string { return fmt.Sprintf("%.02f", v) }
 
 	//act
-	resource.MapFromSlice("testSlice", testSlice).
+	resource.MapChild("testSlice", testSlice).
 		MapWithOptions("FloatValue", MapOptions{FormatCallback: formatToTwoDecimals})
 
 	//assert
 	a := assert.New(t)
-	slice, ok := resource.Values["testSlice"].([]ResourceMap)
+	slice, ok := resource.Values["testSlice"].([]ResourceData)
 	a.True(ok, "'testSlice' must exist")
 
 	var floatValue interface{}
@@ -410,12 +410,12 @@ func Test_MapFromSliceMustSupportMapAll(t *testing.T) {
 	var resource Resource
 
 	//act
-	resource.MapFromSlice("testSlice", testSlice).
+	resource.MapChild("testSlice", testSlice).
 		MapAll()
 
 	//assert
 	a := assert.New(t)
-	slice, ok := resource.Values["testSlice"].([]ResourceMap)
+	slice, ok := resource.Values["testSlice"].([]ResourceData)
 	a.True(ok, "'testSlice' must exist")
 
 	var intValue1 interface{}
@@ -460,13 +460,13 @@ func Test_MapFromSliceMustNotOverwriteMapOptions(t *testing.T) {
 	var resource Resource
 
 	//act
-	resource.MapFromSlice("testSlice", testSlice).
+	resource.MapChild("testSlice", testSlice).
 		MapWithOptions("IntValue", MapOptions{Name: "age"}).
 		MapAll()
 
 	//assert
 	a := assert.New(t)
-	slice, ok := resource.Values["testSlice"].([]ResourceMap)
+	slice, ok := resource.Values["testSlice"].([]ResourceData)
 	a.True(ok, "'testSlice' must exist")
 
 	var age1 interface{}
@@ -501,13 +501,13 @@ func Test_MapFromSliceMustMustNotIncludeExcludedFields(t *testing.T) {
 	var resource Resource
 
 	//act
-	resource.MapFromSlice("testSlice", testSlice).
+	resource.MapChild("testSlice", testSlice).
 		Exclude("IntValue").
 		MapAll()
 
 	//assert
 	a := assert.New(t)
-	slice, ok := resource.Values["testSlice"].([]ResourceMap)
+	slice, ok := resource.Values["testSlice"].([]ResourceData)
 	a.True(ok, "'testSlice' must exist")
 
 	_, ok = slice[0].Values["intValue"]
@@ -525,61 +525,6 @@ func Test_MapFromSliceMustMustNotIncludeExcludedFields(t *testing.T) {
 	stringValue2, ok = slice[1].Values["stringValue"]
 	a.True(ok, "'age2' must exist")
 	a.Equal("Some other text", stringValue2, "'stringValue2' value must be 'Some other text'")
-}
-
-func Test_MapAllFromSliceMustNotRequireEndMap(t *testing.T) {
-	//arrange
-	values := []struct {
-		IntValue    int
-		StringValue string
-	}{{
-		IntValue:    982,
-		StringValue: "Some test text",
-	}, {
-		IntValue:    123,
-		StringValue: "Some other text",
-	}}
-
-	testSlice := make([]interface{}, len(values))
-	for i, v := range values {
-		testSlice[i] = v
-	}
-
-	var resource Resource
-
-	//act
-	resource.MapAllDataFromSlice("testSlice", testSlice).
-		Data("boolValue", false)
-
-	//assert
-	a := assert.New(t)
-	slice, ok := resource.Values["testSlice"].([]ResourceMap)
-	a.True(ok, "'testSlice' must exist")
-
-	var intValue1 interface{}
-	intValue1, ok = slice[0].Values["intValue"]
-	a.True(ok, "'intValue1' must exist")
-	a.Equal(982, intValue1, "'intValue1' value must be '982'")
-
-	var stringValue1 interface{}
-	stringValue1, ok = slice[0].Values["stringValue"]
-	a.True(ok, "'stringValue1' must exist")
-	a.Equal("Some test text", stringValue1, "'stringValue1' value must be 'Some test text'")
-
-	var intValue2 interface{}
-	intValue2, ok = slice[1].Values["intValue"]
-	a.True(ok, "'intValue2' must exist")
-	a.Equal(123, intValue2, "'intValue2' value must be '123'")
-
-	var stringValue2 interface{}
-	stringValue2, ok = slice[1].Values["stringValue"]
-	a.True(ok, "'stringValue2' must exist")
-	a.Equal("Some other text", stringValue2, "'stringValue2' value must be 'Some other text'")
-
-	var boolValue interface{}
-	boolValue, ok = resource.Values["boolValue"]
-	a.True(ok, "'boolValue' must exist")
-	a.Equal(false, boolValue, "'boolValue' value must be false.")
 }
 
 func Test_MustBeAbleToMapSliceMappingAStruct(t *testing.T) {
@@ -620,7 +565,7 @@ func Test_MustBeAbleToMapSliceMappingAStruct(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	slice, ok := resource.Values["slice"].([]ResourceMap)
+	slice, ok := resource.Values["slice"].([]ResourceData)
 	a.True(ok, "'testSlice' must exist")
 
 	var intValue1 interface{}
@@ -680,12 +625,11 @@ func Test_MustBeAbleToMapSliceByFieldWhenMappingAStruct(t *testing.T) {
 		MapChild("Slice").
 		Map("StringValue").
 		Map("IntValue").
-		EndMap().
 		EndMap()
 
 	//assert
 	a := assert.New(t)
-	slice, ok := resource.Values["slice"].([]ResourceMap)
+	slice, ok := resource.Values["slice"].([]ResourceData)
 	a.True(ok, "'slice' must exist")
 
 	var intValue1 interface{}
@@ -736,7 +680,7 @@ func Test_MustBeAbleToRenameWhenMappingAChild(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	slice, ok := resource.Values["slice"].([]ResourceMap)
+	slice, ok := resource.Values["slice"].([]ResourceData)
 	a.True(ok, "'slice' must exist")
 
 	var intValue1 interface{}
@@ -771,12 +715,11 @@ func Test_MustBeAbleToMapAllWhenMappingAChildSlice(t *testing.T) {
 	resource.MapDataFrom(testStruct).
 		MapChild("Slice").
 		MapAll().
-		EndMap().
 		EndMap()
 
 	//assert
 	a := assert.New(t)
-	slice, ok := resource.Values["slice"].([]ResourceMap)
+	slice, ok := resource.Values["slice"].([]ResourceData)
 	a.True(ok, "'slice' must exist")
 
 	var stringValue interface{}
@@ -788,4 +731,85 @@ func Test_MustBeAbleToMapAllWhenMappingAChildSlice(t *testing.T) {
 	intValue, ok = slice[0].Values["intValue"]
 	a.True(ok, "'age' must exist")
 	a.Equal(45, intValue, "'age' value must be '45'")
+}
+
+func Test_MustBeAbleToHandleNestConfigurations(t *testing.T) {
+	//arrange
+	level3 := []struct {
+		IntValue int
+	}{{
+		IntValue: 45,
+	}, {
+		IntValue: 47,
+	}}
+
+	level2 := []struct {
+		Level3 []interface{}
+	}{{
+		Level3: make([]interface{}, len(level3)),
+	}}
+
+	for i, v := range level3 {
+		level2[0].Level3[i] = v
+	}
+
+	level1 := []struct {
+		Level2 []interface{}
+	}{{
+		Level2: make([]interface{}, len(level2)),
+	}}
+
+	for i, v := range level2 {
+		level1[0].Level2[i] = v
+	}
+
+	testStruct := struct {
+		IntValue int
+		Level1   []interface{}
+	}{
+		Level1: make([]interface{}, len(level1)),
+	}
+
+	for i, v := range level1 {
+		testStruct.Level1[i] = v
+	}
+
+	var resource Resource
+
+	//act
+	resource.MapDataFrom(testStruct).
+		MapChild("Level1").
+		MapChild("Level2").
+		MapChild("Level3").
+		MapAll().
+		EndMap().
+		Data("IntValue", 384)
+
+	//assert
+	a := assert.New(t)
+	level1Slice, ok := resource.Values["level1"].([]ResourceData)
+	a.True(ok, "'slice' must exist")
+
+	var level2Slice []ResourceData
+	level2Slice, ok = level1Slice[0].Values["level2"].([]ResourceData)
+	a.True(ok, "'level2' must exist")
+
+	var level3Slice []ResourceData
+	level3Slice, ok = level2Slice[0].Values["level3"].([]ResourceData)
+	a.True(ok, "'level3' must exist")
+
+	var nestedIntValue1 interface{}
+	nestedIntValue1, ok = level3Slice[0].Values["intValue"]
+	a.True(ok, "'nestedIntValue1' must exist")
+	a.Equal(45, nestedIntValue1, "'nestedIntValue1' value must be '45'")
+
+	var nestedIntValue2 interface{}
+	nestedIntValue2, ok = level3Slice[1].Values["intValue"]
+	a.True(ok, "'nestedIntValue2' must exist")
+	a.Equal(47, nestedIntValue2, "'nestedIntValue2' value must be '47'")
+
+	var intValue interface{}
+	intValue, ok = resource.Values["intValue"]
+	a.True(ok, "'intValue' must exist")
+	a.Equal(384, intValue, "'intValue' must be 384")
 }

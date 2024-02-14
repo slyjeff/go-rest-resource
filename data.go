@@ -15,7 +15,7 @@ func (r *Resource) FormattedData(name string, value interface{}, callback Format
 	return r
 }
 
-func (rm *ResourceMap) addToResourceMap(name string, value interface{}) {
+func (rm *ResourceData) addToResourceMap(name string, value interface{}) {
 	name = makeCamelCase(name)
 
 	if rm.Values == nil {
@@ -51,7 +51,7 @@ func createResourceSlice(value interface{}) interface{} {
 
 	firstItem := v.Index(0).Interface()
 	if reflect.TypeOf(firstItem).Kind() == reflect.Struct {
-		slice := make([]ResourceMap, l)
+		slice := make([]ResourceData, l)
 
 		for i := 0; i < l; i++ {
 			slice[i] = createResourceMap(v.Index(i).Interface())
@@ -69,8 +69,8 @@ func createResourceSlice(value interface{}) interface{} {
 	return slice
 }
 
-func createResourceMap(value interface{}) ResourceMap {
-	var rm ResourceMap
+func createResourceMap(value interface{}) ResourceData {
+	var rm ResourceData
 
 	t := reflect.TypeOf(value)
 	v := reflect.ValueOf(value)

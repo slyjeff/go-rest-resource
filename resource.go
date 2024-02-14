@@ -1,13 +1,9 @@
 package GoRestResource
 
 type Resource struct {
-	ResourceMap
+	ResourceData
 }
 
-type ResourceMap struct {
+type ResourceData struct {
 	Values map[string]interface{}
-}
-
-func (rm *ResourceMap) GetResourceMap() *ResourceMap {
-	return rm
 }

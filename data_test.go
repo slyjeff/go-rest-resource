@@ -112,7 +112,7 @@ func Test_DataMustTransformStructToMap(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	m, ok := resource.Values["testStruct"].(ResourceMap)
+	m, ok := resource.Values["testStruct"].(ResourceData)
 	a.True(ok, "'testStruct' must be found in values.")
 
 	var intValue interface{}
@@ -183,7 +183,7 @@ func Test_DatMustTransformStructsToResourceMapsInSlices(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	slice, ok := resource.Values["structs"].([]ResourceMap)
+	slice, ok := resource.Values["structs"].([]ResourceData)
 	a.True(ok, "'structs' must be found in values.")
 
 	var intValue1 interface{}
