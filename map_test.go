@@ -776,6 +776,80 @@ func Test_MapFromChildMustMustNotIncludeExcludedFieldsFromSlice(t *testing.T) {
 	a.Equal("Some other text", stringValue2, "'StringValue2' value must be 'Some other text'")
 }
 
+func Test_MustBeAbleToMapChildStruct(t *testing.T) {
+	//arrange
+	type childStruct struct {
+		IntValue    int
+		StringValue string
+	}
+
+	testStruct := struct {
+		StringValue string
+		IntValue    int
+		ChildStruct childStruct
+	}{
+		"Hi there",
+		9382,
+		childStruct{982, "Some test text"},
+	}
+
+	var resource Resource
+
+	//act
+	resource.MapDataFrom(testStruct).
+		Map("StringValue").
+		Map("IntValue").
+		MapChild("ChildStruct").
+		Map("StringValue").
+		Map("IntValue").
+		EndMap()
+
+	//assert
+	a := assert.New(t)
+	rd, ok := resource.Values["ChildStruct"].(ResourceData)
+	a.True(ok, "'ChildStruct' must exist")
+
+	var intValue interface{}
+	intValue, ok = rd.Values["IntValue"]
+	a.True(ok, "'IntValue1' must exist")
+	a.Equal(982, intValue, "'intValue' value must be '982'")
+
+	var stringValue interface{}
+	stringValue, ok = rd.Values["StringValue"]
+	a.True(ok, "'StringValue' must exist")
+	a.Equal("Some test text", stringValue, "'StringValue' value must be 'Some test text'")
+}
+
+func Test_MustBeAbleToRenameFieldsInChildStruct(t *testing.T) {
+	//arrange
+	type childStruct struct {
+		IntValue int
+	}
+
+	testStruct := struct {
+		ChildStruct childStruct
+	}{
+		childStruct{45},
+	}
+
+	var resource Resource
+
+	//act
+	resource.MapDataFrom(testStruct).
+		MapChild("ChildStruct").
+		MapWithOptions("IntValue", MapOptions{Name: "age"})
+
+	//assert
+	a := assert.New(t)
+	rd, ok := resource.Values["ChildStruct"].(ResourceData)
+	a.True(ok, "'ChildStruct' must exist")
+
+	var intValue1 interface{}
+	intValue1, ok = rd.Values["age"]
+	a.True(ok, "'age' must exist")
+	a.Equal(45, intValue1, "'age' value must be '45'")
+}
+
 func Test_MustBeAbleToMapChildSlice(t *testing.T) {
 	//arrange
 	values := []struct {
@@ -920,9 +994,9 @@ func Test_MustBeAbleToMapAllInChildSlice(t *testing.T) {
 	a.Equal(45, intValue, "'IntValue' value must be '45'")
 }
 
-func Test_MustBeAbleToHandleNestConfigurations(t *testing.T) {
+func Test_MustBeAbleToHandleNestedChildren(t *testing.T) {
 	//arrange
-	level3 := []struct {
+	level3Version1 := []struct {
 		IntValue int
 	}{{
 		IntValue: 45,
@@ -930,14 +1004,31 @@ func Test_MustBeAbleToHandleNestConfigurations(t *testing.T) {
 		IntValue: 47,
 	}}
 
-	level2 := []struct {
-		Level3 []interface{}
+	level3Version2 := []struct {
+		IntValue int
 	}{{
-		Level3: make([]interface{}, len(level3)),
+		IntValue: 854,
+	}, {
+		IntValue: 234,
 	}}
 
-	for i, v := range level3 {
+	level2 := []struct {
+		StringValue string
+		Level3      []interface{}
+	}{{
+		StringValue: "test text 1",
+		Level3:      make([]interface{}, len(level3Version1)),
+	}, {
+		StringValue: "test text 2",
+		Level3:      make([]interface{}, len(level3Version2)),
+	}}
+
+	for i, v := range level3Version1 {
 		level2[0].Level3[i] = v
+	}
+
+	for i, v := range level3Version2 {
+		level2[1].Level3[i] = v
 	}
 
 	level1 := []struct {
@@ -967,6 +1058,7 @@ func Test_MustBeAbleToHandleNestConfigurations(t *testing.T) {
 	resource.MapDataFrom(testStruct).
 		MapChild("Level1").
 		MapChild("Level2").
+		MapAll().
 		MapChild("Level3").
 		MapAll().
 		EndMap().
@@ -981,19 +1073,43 @@ func Test_MustBeAbleToHandleNestConfigurations(t *testing.T) {
 	level2Slice, ok = level1Slice[0].Values["Level2"].([]ResourceData)
 	a.True(ok, "'Level2' must exist")
 
-	var level3Slice []ResourceData
-	level3Slice, ok = level2Slice[0].Values["Level3"].([]ResourceData)
-	a.True(ok, "'Level3' must exist")
+	var stringValue1 interface{}
+	stringValue1, ok = level2Slice[0].Values["StringValue"]
+	a.True(ok, "'stringValue1' must exist")
+	a.Equal("test text 1", stringValue1, "'stringValue1' value must be 'test text 1'")
+
+	var stringValue2 interface{}
+	stringValue2, ok = level2Slice[1].Values["StringValue"]
+	a.True(ok, "'stringValue2' must exist")
+	a.Equal("test text 2", stringValue2, "'stringValue2' value must be 'test text 2'")
+
+	var firstLevel3Slice []ResourceData
+	firstLevel3Slice, ok = level2Slice[0].Values["Level3"].([]ResourceData)
+	a.True(ok, "'firstLevel3Slice' must exist")
 
 	var nestedIntValue1 interface{}
-	nestedIntValue1, ok = level3Slice[0].Values["IntValue"]
+	nestedIntValue1, ok = firstLevel3Slice[0].Values["IntValue"]
 	a.True(ok, "'nestedIntValue1' must exist")
 	a.Equal(45, nestedIntValue1, "'nestedIntValue1' value must be '45'")
 
 	var nestedIntValue2 interface{}
-	nestedIntValue2, ok = level3Slice[1].Values["IntValue"]
+	nestedIntValue2, ok = firstLevel3Slice[1].Values["IntValue"]
 	a.True(ok, "'nestedIntValue2' must exist")
 	a.Equal(47, nestedIntValue2, "'nestedIntValue2' value must be '47'")
+
+	var secondLevel3Slice []ResourceData
+	secondLevel3Slice, ok = level2Slice[1].Values["Level3"].([]ResourceData)
+	a.True(ok, "'secondLevel3Slice' must exist")
+
+	var nestedIntValue3 interface{}
+	nestedIntValue3, ok = secondLevel3Slice[0].Values["IntValue"]
+	a.True(ok, "'nestedIntValue3' must exist")
+	a.Equal(854, nestedIntValue3, "'nestedIntValue3' value must be '854'")
+
+	var nestedIntValue4 interface{}
+	nestedIntValue4, ok = secondLevel3Slice[1].Values["IntValue"]
+	a.True(ok, "'nestedIntValue4' must exist")
+	a.Equal(234, nestedIntValue4, "'nestedIntValue4' value must be '234'")
 
 	var intValue interface{}
 	intValue, ok = resource.Values["IntValue"]

@@ -5,5 +5,14 @@ import (
 )
 
 func getValueByName(source interface{}, fieldName string) interface{} {
-	return reflect.ValueOf(source).FieldByName(fieldName).Interface()
+	if source == nil {
+		return nil
+	}
+
+	value := reflect.ValueOf(source).FieldByName(fieldName)
+	if !value.IsValid() {
+		return nil
+	}
+
+	return value.Interface() //, true
 }

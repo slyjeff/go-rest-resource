@@ -17,8 +17,13 @@ func (r *Resource) FormattedData(name string, value interface{}, callback Format
 }
 
 func createResourceData(value interface{}) interface{} {
+	if value == nil {
+		return nil
+	}
+
 	_, ok := value.(FormattedData)
 	if ok {
+
 		return value
 	}
 
