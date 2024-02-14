@@ -28,7 +28,7 @@ func newConfigureMap(r *Resource, copyPairs ...copyPair) ConfigureMap {
 	return ConfigureMap{r, copyPairs, make([]string, 0)}
 }
 
-func (r *Resource) MapChild(fieldName string, source interface{}) ChildMapper {
+func (r *Resource) MapChild(fieldName string, source interface{}) *ConfigureMap {
 	sourceItems, ok := source.([]interface{})
 	if ok {
 		return mapChildSlice(r, &r.ResourceData, fieldName, sourceItems)
@@ -41,18 +41,23 @@ func (r *Resource) MapAllDataFrom(source interface{}) *Resource {
 	return r.MapDataFrom(source).MapAll().EndMap()
 }
 
-func (r *Resource) MapDataFrom(source interface{}) ChildMapper {
+func (r *Resource) MapDataFrom(source interface{}) *ConfigureMap {
 	configuration := newConfigureMap(r, newSingleCopyPair(source, &r.ResourceData))
 	return &configuration
 }
 
-func (cm *ConfigureMap) Map(fieldName string) ChildMapper {
+type MapOptions struct {
+	Name           string
+	FormatCallback FormatDataCallback
+}
+
+func (cm *ConfigureMap) Map(fieldName string) *ConfigureMap {
 	cm.MapWithOptions(fieldName, MapOptions{})
 
 	return cm
 }
 
-func (cm *ConfigureMap) MapWithOptions(fieldName string, mapOptions MapOptions) ChildMapper {
+func (cm *ConfigureMap) MapWithOptions(fieldName string, mapOptions MapOptions) *ConfigureMap {
 	var name string
 	if mapOptions.Name == "" {
 		name = fieldName
@@ -80,7 +85,7 @@ func (cm *ConfigureMap) MapWithOptions(fieldName string, mapOptions MapOptions) 
 	return cm
 }
 
-func (cm *ConfigureMap) MapChild(fieldName string) ChildMapper {
+func (cm *ConfigureMap) MapChild(fieldName string) *ConfigureMap {
 	copyPairs := make([]copyPair, 0)
 
 	for _, cp := range cm.copyPairs {
@@ -115,7 +120,7 @@ func (cm *ConfigureMap) MapChild(fieldName string) ChildMapper {
 	return &newConfigureMap
 }
 
-func mapChildSlice(r *Resource, rd *ResourceData, fieldName string, sourceItems []interface{}) ChildMapper {
+func mapChildSlice(r *Resource, rd *ResourceData, fieldName string, sourceItems []interface{}) *ConfigureMap {
 	destinationItems := make([]ResourceData, len(sourceItems))
 	for i := range sourceItems {
 		destinationItems[i] = ResourceData{make(map[string]interface{})}
@@ -134,7 +139,7 @@ func mapChildSlice(r *Resource, rd *ResourceData, fieldName string, sourceItems 
 	return &csm
 }
 
-func mapChildStruct(r *Resource, rd *ResourceData, fieldName string, source interface{}) ChildMapper {
+func mapChildStruct(r *Resource, rd *ResourceData, fieldName string, source interface{}) *ConfigureMap {
 	childResourceData := ResourceData{Values: make(map[string]interface{})}
 	rd.AddData(fieldName, childResourceData)
 
@@ -142,7 +147,7 @@ func mapChildStruct(r *Resource, rd *ResourceData, fieldName string, source inte
 	return &cm
 }
 
-func (cm *ConfigureMap) MapAll() ChildMapper {
+func (cm *ConfigureMap) MapAll() *ConfigureMap {
 	if len(cm.copyPairs[0].sourceItems) == 0 {
 		return cm
 	}
@@ -162,7 +167,7 @@ func (cm *ConfigureMap) MapAll() ChildMapper {
 	return cm
 }
 
-func (cm *ConfigureMap) Exclude(fieldName string) ChildMapper {
+func (cm *ConfigureMap) Exclude(fieldName string) *ConfigureMap {
 	cm.excludedFields = append(cm.excludedFields, fieldName)
 
 	for _, copyPair := range cm.copyPairs {
