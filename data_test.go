@@ -21,20 +21,6 @@ func Test_DataMustAddStringToResource(t *testing.T) {
 	a.Equal(message, value, "'message' value must be 'TestMessage'")
 }
 
-func Test_DataNameMustBeCamelCase(t *testing.T) {
-	//arrange
-	message := "Test Message"
-	var resource Resource
-
-	//act
-	resource.Data("Message", message)
-
-	//assert
-	a := assert.New(t)
-	_, ok := resource.Values["message"]
-	a.True(ok, resource.Values["message"], "'message' name must start with a lowercase letter.")
-}
-
 func Test_DataMustStoreInt(t *testing.T) {
 	//arrange
 	number := 42
@@ -116,16 +102,16 @@ func Test_DataMustTransformStructToMap(t *testing.T) {
 	a.True(ok, "'testStruct' must be found in values.")
 
 	var intValue interface{}
-	intValue, ok = m.Values["intValue"]
+	intValue, ok = m.Values["IntValue"]
 
-	a.True(ok, "'intValue' must be int 'testStruct'.")
-	a.Equal(982, intValue, "'intValue' value must be '982'.")
+	a.True(ok, "'IntValue' must be int 'testStruct'.")
+	a.Equal(982, intValue, "'IntValue' value must be '982'.")
 
 	var stringValue interface{}
-	stringValue, ok = m.Values["stringValue"]
+	stringValue, ok = m.Values["StringValue"]
 
-	a.True(ok, "'stringValue' must be int 'testStruct'.")
-	a.Equal("Some test text.", stringValue, "'stringValue' value must be 'Some text'.")
+	a.True(ok, "'StringValue' must be int 'testStruct'.")
+	a.Equal("Some test text.", stringValue, "'StringValue' value must be 'Some text'.")
 }
 
 func Test_DataMustAddSliceToResource(t *testing.T) {
@@ -187,22 +173,22 @@ func Test_DatMustTransformStructsToResourceMapsInSlices(t *testing.T) {
 	a.True(ok, "'structs' must be found in values.")
 
 	var intValue1 interface{}
-	intValue1, ok = slice[0].Values["intValue"]
-	a.True(ok, "'intValue' must be found in first testMap.")
-	a.Equal(43, intValue1, "'intValue' must be '43'.")
+	intValue1, ok = slice[0].Values["IntValue"]
+	a.True(ok, "'IntValue' must be found in first testMap.")
+	a.Equal(43, intValue1, "'IntValue' must be '43'.")
 
 	var stringValue1 interface{}
-	stringValue1, ok = slice[0].Values["stringValue"]
-	a.True(ok, "'stringValue' must be found in first testMap.")
-	a.Equal("test 1", stringValue1, "'stringValue' must be 'test 1'.")
+	stringValue1, ok = slice[0].Values["StringValue"]
+	a.True(ok, "'StringValue' must be found in first testMap.")
+	a.Equal("test 1", stringValue1, "'StringValue' must be 'test 1'.")
 
 	var intValue2 interface{}
-	intValue2, ok = slice[1].Values["intValue"]
-	a.True(ok, "'intValue' must be found in second testMap.")
-	a.Equal(367, intValue2, "'intValue' must be '367'.")
+	intValue2, ok = slice[1].Values["IntValue"]
+	a.True(ok, "'IntValue' must be found in second testMap.")
+	a.Equal(367, intValue2, "'IntValue' must be '367'.")
 
 	var stringValue2 interface{}
-	stringValue2, ok = slice[1].Values["stringValue"]
-	a.True(ok, "'stringValue' must be found in second testMap.")
-	a.Equal("test 2", stringValue2, "'stringValue' must be 'test 2'.")
+	stringValue2, ok = slice[1].Values["StringValue"]
+	a.True(ok, "'StringValue' must be found in second testMap.")
+	a.Equal("test 2", stringValue2, "'StringValue' must be 'test 2'.")
 }

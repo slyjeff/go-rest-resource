@@ -29,9 +29,9 @@ func (csm *ConfigureSliceMap) Map(fieldName string) ChildMapper {
 func (csm *ConfigureSliceMap) MapWithOptions(fieldName string, mapOptions MapOptions) ChildMapper {
 	var name string
 	if mapOptions.Name == "" {
-		name = makeCamelCase(fieldName)
+		name = fieldName
 	} else {
-		name = makeCamelCase(mapOptions.Name)
+		name = mapOptions.Name
 	}
 
 	for _, copyPair := range csm.copyPairs {
@@ -102,8 +102,6 @@ func (csm *ConfigureSliceMap) MapAll() ChildMapper {
 func (csm *ConfigureSliceMap) Exclude(fieldName string) ChildMapper {
 	csm.excludedFields = append(csm.excludedFields, fieldName)
 
-	name := makeCamelCase(fieldName)
-
 	for _, copyPair := range csm.copyPairs {
 		for i, v := range copyPair.sourceItems {
 			resourceData := copyPair.destinationItems[i]
@@ -111,7 +109,7 @@ func (csm *ConfigureSliceMap) Exclude(fieldName string) ChildMapper {
 			value := getValueByName(v, fieldName)
 			value = createResourceData(value)
 
-			delete(resourceData.Values, name)
+			delete(resourceData.Values, fieldName)
 		}
 	}
 

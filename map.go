@@ -72,8 +72,7 @@ func mapChildSlice(r *Resource, rd *ResourceData, fieldName string, sourceItems 
 	}
 
 	rd.AddData(fieldName, destinationItems)
-	name := makeCamelCase(fieldName)
-	rd.Values[name] = destinationItems
+	rd.Values[fieldName] = destinationItems
 
 	copyPairs := []copyPair{{sourceItems, destinationItems}}
 
@@ -100,7 +99,7 @@ func (cm *ConfigureMap) MapAll() ChildMapper {
 			continue
 		}
 
-		if _, ok := cm.resourceData.Values[makeCamelCase(fieldName)]; ok {
+		if _, ok := cm.resourceData.Values[fieldName]; ok {
 			continue
 		}
 
@@ -115,7 +114,7 @@ func (cm *ConfigureMap) MapAll() ChildMapper {
 func (cm *ConfigureMap) Exclude(fieldName string) ChildMapper {
 	cm.excludedFields = append(cm.excludedFields, fieldName)
 
-	delete(cm.resourceData.Values, makeCamelCase(fieldName))
+	delete(cm.resourceData.Values, fieldName)
 
 	return cm
 }
