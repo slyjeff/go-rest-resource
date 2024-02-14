@@ -18,11 +18,11 @@ func newConfigureMap(r *Resource, rd *ResourceData, source interface{}) Configur
 
 func (r *Resource) MapChild(fieldName string, source interface{}) ChildMapper {
 	sourceItems, ok := source.([]interface{})
-	if !ok {
-		sourceItems = make([]interface{}, 0)
+	if ok {
+		return mapChildSlice(r, &r.ResourceData, fieldName, sourceItems)
 	}
 
-	return mapChild(r, &r.ResourceData, fieldName, sourceItems)
+	return mapChildStruct(r, &r.ResourceData, fieldName, source)
 }
 
 func (r *Resource) MapAllDataFrom(source interface{}) *Resource {
@@ -52,12 +52,7 @@ func (cm *ConfigureMap) MapWithOptions(fieldName string, mapOptions MapOptions) 
 		v = FormattedData{v, mapOptions.FormatCallback}
 	}
 
-	if cm.resourceData.Values == nil {
-		cm.resourceData.Values = make(map[string]interface{})
-	}
-
-	name := makeCamelCase(fieldName)
-	cm.resourceData.Values[name] = v
+	cm.resourceData.AddData(fieldName, v)
 
 	return cm
 }
@@ -67,19 +62,16 @@ func (cm *ConfigureMap) MapChild(fieldName string) ChildMapper {
 	if !ok {
 		sourceItems = make([]interface{}, 0)
 	}
-	return mapChild(cm.resource, cm.resourceData, fieldName, sourceItems)
+	return mapChildSlice(cm.resource, cm.resourceData, fieldName, sourceItems)
 }
 
-func mapChild(r *Resource, rd *ResourceData, fieldName string, sourceItems []interface{}) ChildMapper {
+func mapChildSlice(r *Resource, rd *ResourceData, fieldName string, sourceItems []interface{}) ChildMapper {
 	destinationItems := make([]ResourceData, len(sourceItems))
 	for i := range sourceItems {
 		destinationItems[i] = ResourceData{make(map[string]interface{})}
 	}
 
-	if rd.Values == nil {
-		rd.Values = make(map[string]interface{})
-	}
-
+	rd.AddData(fieldName, destinationItems)
 	name := makeCamelCase(fieldName)
 	rd.Values[name] = destinationItems
 
@@ -89,38 +81,41 @@ func mapChild(r *Resource, rd *ResourceData, fieldName string, sourceItems []int
 	return &csm
 }
 
+func mapChildStruct(r *Resource, rd *ResourceData, fieldName string, source interface{}) ChildMapper {
+	childResourceData := ResourceData{Values: make(map[string]interface{})}
+	rd.AddData(fieldName, childResourceData)
+
+	cm := newConfigureMap(r, &childResourceData, source)
+	return &cm
+}
+
 func (cm *ConfigureMap) MapAll() ChildMapper {
 	t := reflect.TypeOf(cm.source)
-	v := reflect.ValueOf(cm.source)
+	v := reflect.ValueOf(cm.source).Interface()
 
 	for i := 0; i < t.NumField(); i++ {
-		fieldName := makeCamelCase(t.Field(i).Name)
+		fieldName := t.Field(i).Name
 
 		if slices.Contains(cm.excludedFields, fieldName) {
 			continue
 		}
 
-		if _, ok := cm.resourceData.Values[fieldName]; ok {
+		if _, ok := cm.resourceData.Values[makeCamelCase(fieldName)]; ok {
 			continue
 		}
 
-		if cm.resourceData.Values == nil {
-			cm.resourceData.Values = make(map[string]interface{})
-		}
+		value := getValueByName(v, fieldName)
 
-		v := v.Field(i).Interface()
-		name := makeCamelCase(fieldName)
-		cm.resourceData.Values[name] = v
+		cm.resourceData.AddData(fieldName, value)
 	}
 
 	return cm
 }
 
 func (cm *ConfigureMap) Exclude(fieldName string) ChildMapper {
-	fieldName = makeCamelCase(fieldName)
 	cm.excludedFields = append(cm.excludedFields, fieldName)
 
-	delete(cm.resourceData.Values, fieldName)
+	delete(cm.resourceData.Values, makeCamelCase(fieldName))
 
 	return cm
 }

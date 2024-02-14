@@ -68,12 +68,7 @@ func (csm *ConfigureSliceMap) MapChild(fieldName string) ChildMapper {
 				destinationItems[i] = ResourceData{make(map[string]interface{})}
 			}
 
-			if rd.Values == nil {
-				rd.Values = make(map[string]interface{})
-			}
-
-			name := makeCamelCase(fieldName)
-			rd.Values[name] = destinationItems
+			rd.AddData(fieldName, destinationItems)
 
 			copyPairs = append(copyPairs, copyPair{sourceItems, destinationItems})
 		}
@@ -93,20 +88,21 @@ func (csm *ConfigureSliceMap) MapAll() ChildMapper {
 	t := reflect.TypeOf(firstItem)
 
 	for i := 0; i < t.NumField(); i++ {
-		var fieldName = makeCamelCase(t.Field(i).Name)
+		var fieldName = t.Field(i).Name
 		if slices.Contains(csm.excludedFields, fieldName) {
 			continue
 		}
 
-		csm.MapWithOptions(t.Field(i).Name, MapOptions{})
+		csm.MapWithOptions(fieldName, MapOptions{})
 	}
 
 	return csm
 }
 
 func (csm *ConfigureSliceMap) Exclude(fieldName string) ChildMapper {
+	csm.excludedFields = append(csm.excludedFields, fieldName)
+
 	name := makeCamelCase(fieldName)
-	csm.excludedFields = append(csm.excludedFields, name)
 
 	for _, copyPair := range csm.copyPairs {
 		for i, v := range copyPair.sourceItems {
@@ -125,83 +121,3 @@ func (csm *ConfigureSliceMap) Exclude(fieldName string) ChildMapper {
 func (csm *ConfigureSliceMap) EndMap() *Resource {
 	return csm.resource
 }
-
-//
-//type ConfigureSliceMapFromResource struct {
-//	configureSlice
-//	resource *Resource
-//}
-//
-//func newConfigureSliceMapFromResource(r *Resource, slice []ResourceData, source []interface{}) ConfigureSliceMapFromResource {
-//	return ConfigureSliceMapFromResource{newConfigureSlice(&r.ResourceData, slice, source), r}
-//}
-//
-//type ConfigureChildSliceOfResourceMap struct {
-//	configureSlice
-//	parent *ConfigureResourceMap
-//}
-//
-//func newConfigureChildSliceOfResourceMap(parent *ConfigureResourceMap, slice []ResourceData, source []interface{}) ConfigureChildSliceOfResourceMap {
-//	return ConfigureChildSliceOfResourceMap{newConfigureSlice(parent.ResourceMap, slice, source), parent}
-//}
-//
-//type ConfigureChildSliceMap struct {
-//	configureSlice
-//	parent *ConfigureResourceMap
-//}
-//
-//func newConfigureChildSliceOfResourceMap(parent *ConfigureResourceMap, slice []ResourceData, source []interface{}) ConfigureChildSliceOfResourceMap {
-//	return ConfigureChildSliceOfResourceMap{newConfigureSlice(parent.ResourceMap, slice, source), parent}
-//}
-//
-//func (configuration *ConfigureSliceMapFromResource) Map(fieldName string) *ConfigureSliceMapFromResource {
-//	configuration.MapWithOptions(fieldName, MapOptions{})
-//
-//	return configuration
-//}
-//
-//func (configuration *ConfigureSliceMapFromResource) MapWithOptions(fieldName string, mapOptions MapOptions) *ConfigureSliceMapFromResource {
-//	configuration.configureSlice.mapWithOptions(fieldName, mapOptions)
-//	return configuration
-//}
-//
-//func (configuration *ConfigureSliceMapFromResource) MapAll() *ConfigureSliceMapFromResource {
-//	configuration.configureSlice.mapAll()
-//	return configuration
-//}
-//
-//func (configuration *ConfigureSliceMapFromResource) Exclude(fieldName string) *ConfigureSliceMapFromResource {
-//	configuration.excludeField(fieldName)
-//
-//	return configuration
-//}
-//
-//func (configuration *ConfigureSliceMapFromResource) EndMap() *Resource {
-//	return configuration.resource
-//}
-//
-//func (configuration *ConfigureChildSliceOfResourceMap) Map(fieldName string) ConfigureChildOfResourceMap {
-//	configuration.MapWithOptions(fieldName, MapOptions{})
-//	return configuration
-//}
-//
-//func (configuration *ConfigureChildSliceOfResourceMap) MapWithOptions(fieldName string, mapOptions MapOptions) ConfigureChildOfResourceMap {
-//	configuration.configureSlice.mapWithOptions(fieldName, mapOptions)
-//	return configuration
-//}
-//
-//func (configuration *ConfigureChildSliceOfResourceMap) MapChild(fieldName string) ConfigureChildMap {
-//	slice, source := configuration.configureSlice.mapChild(fieldName)
-//
-//	childConfiguration = newConfigureChildSliceMap()
-//	return &childConfiguration
-//}
-//
-//func (configuration *ConfigureChildSliceOfResourceMap) MapAll() ConfigureChildOfResourceMap {
-//	configuration.configureSlice.mapAll()
-//	return configuration
-//}
-//
-//func (configuration *ConfigureChildSliceOfResourceMap) EndMap() *ConfigureResourceMap {
-//	return configuration.parent
-//}

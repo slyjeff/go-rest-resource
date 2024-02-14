@@ -5,24 +5,15 @@ import (
 )
 
 func (r *Resource) Data(name string, value interface{}) *Resource {
-	r.addToResourceMap(name, value)
+	value = createResourceData(value)
+	r.AddData(name, value)
 	return r
 }
 
 func (r *Resource) FormattedData(name string, value interface{}, callback FormatDataCallback) *Resource {
 	fd := FormattedData{value, callback}
-	r.addToResourceMap(name, fd)
+	r.AddData(name, fd)
 	return r
-}
-
-func (rm *ResourceData) addToResourceMap(name string, value interface{}) {
-	name = makeCamelCase(name)
-
-	if rm.Values == nil {
-		rm.Values = make(map[string]interface{})
-	}
-
-	rm.Values[name] = createResourceData(value)
 }
 
 func createResourceData(value interface{}) interface{} {
@@ -75,7 +66,8 @@ func createResourceMap(value interface{}) ResourceData {
 	t := reflect.TypeOf(value)
 	v := reflect.ValueOf(value)
 	for i := 0; i < t.NumField(); i++ {
-		rm.addToResourceMap(t.Field(i).Name, v.Field(i).Interface())
+		v := createResourceData(v.Field(i).Interface())
+		rm.AddData(t.Field(i).Name, v)
 	}
 
 	return rm

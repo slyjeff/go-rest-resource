@@ -7,3 +7,10 @@ type Resource struct {
 type ResourceData struct {
 	Values map[string]interface{}
 }
+
+func (rd *ResourceData) AddData(fieldName string, value interface{}) {
+	if rd.Values == nil {
+		rd.Values = make(map[string]interface{})
+	}
+	rd.Values[makeCamelCase(fieldName)] = value
+}
