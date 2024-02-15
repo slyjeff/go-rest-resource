@@ -329,22 +329,22 @@ func Test_MustBeAbleToMapSliceMappingAStruct(t *testing.T) {
 	a.True(ok, "'Slice' must exist")
 
 	var intValue1 interface{}
-	intValue1, ok = slice[0].Values["IntValue"]
+	intValue1, ok = slice[0]["IntValue"]
 	a.True(ok, "'IntValue' must exist")
 	a.Equal(982, intValue1, "'IntValue' value must be '982'")
 
 	var stringValue1 interface{}
-	stringValue1, ok = slice[0].Values["StringValue"]
+	stringValue1, ok = slice[0]["StringValue"]
 	a.True(ok, "'StringValue1' must exist")
 	a.Equal("Some test text", stringValue1, "'StringValue1' value must be 'Some test text'")
 
 	var intValue2 interface{}
-	intValue2, ok = slice[1].Values["IntValue"]
+	intValue2, ok = slice[1]["IntValue"]
 	a.True(ok, "'IntValue2' must exist")
 	a.Equal(123, intValue2, "'IntValue2' value must be '123'")
 
 	var stringValue2 interface{}
-	stringValue2, ok = slice[1].Values["StringValue"]
+	stringValue2, ok = slice[1]["StringValue"]
 	a.True(ok, "'StringValue2' must exist")
 	a.Equal("Some other text", stringValue2, "'StringValue2' value must be 'Some other text'")
 }
@@ -370,20 +370,20 @@ func Test_MapFromChildMustMapIndicatedFieldsFromStruct(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	rd, ok := resource.Values["testStruct"].(MappedData)
+	md, ok := resource.Values["testStruct"].(MappedData)
 	a.True(ok, "'testStruct' must exist")
 
 	var intValue interface{}
-	intValue, ok = rd.Values["IntValue"]
+	intValue, ok = md["IntValue"]
 	a.True(ok, "'IntValue' must exist")
 	a.Equal(982, intValue, "'IntValue' value must be '982'")
 
 	var stringValue interface{}
-	stringValue, ok = rd.Values["StringValue"]
+	stringValue, ok = md["StringValue"]
 	a.True(ok, "'StringValue' must exist")
 	a.Equal("Some test text", stringValue, "'StringValue' value must be 'Some test text'")
 
-	_, ok = rd.Values["BoolValue"]
+	_, ok = md["BoolValue"]
 	a.False(ok, "'BoolValue' must not exist")
 }
 
@@ -403,11 +403,11 @@ func Test_MapFromChildMustAllowRenamingOfFieldsFromStruct(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	rd, ok := resource.Values["testStruct"].(MappedData)
+	md, ok := resource.Values["testStruct"].(MappedData)
 	a.True(ok, "'testStruct' must exist")
 
 	var intValue1 interface{}
-	intValue1, ok = rd.Values["age"]
+	intValue1, ok = md["age"]
 	a.True(ok, "'age' must exist")
 	a.Equal(13, intValue1, "'age' value must be '13'")
 }
@@ -430,11 +430,11 @@ func Test_MapFromChildMustAllowFormattingOfFieldsFromStruct(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	rd, ok := resource.Values["testStruct"].(MappedData)
+	values, ok := resource.Values["testStruct"].(MappedData)
 	a.True(ok, "'testStruct' must exist")
 
 	var floatValue interface{}
-	floatValue, ok = rd.Values["FloatValue"]
+	floatValue, ok = values["FloatValue"]
 	a.True(ok, "'FloatValue' must exist")
 
 	var fd FormattedData
@@ -463,16 +463,16 @@ func Test_MapFromChildMustSupportMapAllFromStruct(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	rd, ok := resource.Values["testStruct"].(MappedData)
+	md, ok := resource.Values["testStruct"].(MappedData)
 	a.True(ok, "'testStruct' must exist")
 
 	var intValue interface{}
-	intValue, ok = rd.Values["IntValue"]
+	intValue, ok = md["IntValue"]
 	a.True(ok, "'IntValue' must exist")
 	a.Equal(982, intValue, "'intValue' value must be '982'")
 
 	var stringValue interface{}
-	stringValue, ok = rd.Values["StringValue"]
+	stringValue, ok = md["StringValue"]
 	a.True(ok, "'StringValue' must exist")
 	a.Equal("Some test text", stringValue, "'StringValue' value must be 'Some test text'")
 }
@@ -496,11 +496,11 @@ func Test_MapFromChildMustNotOverwriteMapOptionsFromStruct(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	rd, ok := resource.Values["testStruct"].(MappedData)
+	md, ok := resource.Values["testStruct"].(MappedData)
 	a.True(ok, "'testStruct' must exist")
 
 	var age interface{}
-	age, ok = rd.Values["age"]
+	age, ok = md["age"]
 	a.True(ok, "'age' must exist")
 	a.Equal(49, age, "'age' value must be '49'")
 }
@@ -524,14 +524,14 @@ func Test_MapFromChildMustMustNotIncludeExcludedFieldsFromStruct(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	rd, ok := resource.Values["testStruct"].(MappedData)
+	md, ok := resource.Values["testStruct"].(MappedData)
 	a.True(ok, "'testStruct' must exist")
 
-	_, ok = rd.Values["IntValue"]
+	_, ok = md["IntValue"]
 	a.False(ok, "'IntValue' must not exist")
 
 	var stringValue interface{}
-	stringValue, ok = rd.Values["StringValue"]
+	stringValue, ok = md["StringValue"]
 	a.True(ok, "'StringValue' must exist")
 	a.Equal("Some test text", stringValue, "'StringValue' value must be 'Some test text'")
 }
@@ -570,25 +570,25 @@ func Test_MapFromChildMustMapIndicatedFieldsFromSlice(t *testing.T) {
 	a.True(ok, "'testSlice' must exist")
 
 	var intValue1 interface{}
-	intValue1, ok = slice[0].Values["IntValue"]
+	intValue1, ok = slice[0]["IntValue"]
 	a.True(ok, "'IntValue1' must exist")
 	a.Equal(982, intValue1, "'IntValue1' value must be '982'")
 
 	var stringValue1 interface{}
-	stringValue1, ok = slice[0].Values["StringValue"]
+	stringValue1, ok = slice[0]["StringValue"]
 	a.True(ok, "'StringValue1' must exist")
 	a.Equal("Some test text", stringValue1, "'StringValue1' value must be 'Some test text'")
 
-	_, ok = slice[0].Values["BoolValue"]
+	_, ok = slice[0]["BoolValue"]
 	a.False(ok, "'BoolValue' must not exist")
 
 	var intValue2 interface{}
-	intValue2, ok = slice[1].Values["IntValue"]
+	intValue2, ok = slice[1]["IntValue"]
 	a.True(ok, "'IntValue2' must exist")
 	a.Equal(123, intValue2, "'IntValue2' value must be '123'")
 
 	var stringValue2 interface{}
-	stringValue2, ok = slice[1].Values["StringValue"]
+	stringValue2, ok = slice[1]["StringValue"]
 	a.True(ok, "'StringValue2' must exist")
 	a.Equal("Some other text", stringValue2, "'StringValue2' value must be 'Some other text'")
 }
@@ -618,7 +618,7 @@ func Test_MapFromChildMustAllowRenamingOfFieldsFromSlice(t *testing.T) {
 	a.True(ok, "'testSlice' must exist")
 
 	var intValue1 interface{}
-	intValue1, ok = slice[0].Values["age"]
+	intValue1, ok = slice[0]["age"]
 	a.True(ok, "'age' must exist")
 	a.Equal(13, intValue1, "'age' value must be '13'")
 }
@@ -650,7 +650,7 @@ func Test_MapFromChildMustAllowFormattingOfFieldsFromSlice(t *testing.T) {
 	a.True(ok, "'testSlice' must exist")
 
 	var floatValue interface{}
-	floatValue, ok = slice[0].Values["FloatValue"]
+	floatValue, ok = slice[0]["FloatValue"]
 	a.True(ok, "'FloatValue' must exist")
 
 	var fd FormattedData
@@ -691,22 +691,22 @@ func Test_MapFromChildMustSupportMapAllFromSlice(t *testing.T) {
 	a.True(ok, "'testSlice' must exist")
 
 	var intValue1 interface{}
-	intValue1, ok = slice[0].Values["IntValue"]
+	intValue1, ok = slice[0]["IntValue"]
 	a.True(ok, "'IntValue1' must exist")
 	a.Equal(982, intValue1, "'IntValue1' value must be '982'")
 
 	var stringValue1 interface{}
-	stringValue1, ok = slice[0].Values["StringValue"]
+	stringValue1, ok = slice[0]["StringValue"]
 	a.True(ok, "'StringValue1' must exist")
 	a.Equal("Some test text", stringValue1, "'StringValue1' value must be 'Some test text'")
 
 	var intValue2 interface{}
-	intValue2, ok = slice[1].Values["IntValue"]
+	intValue2, ok = slice[1]["IntValue"]
 	a.True(ok, "'IntValue2' must exist")
 	a.Equal(123, intValue2, "'IntValue2' value must be '123'")
 
 	var stringValue2 interface{}
-	stringValue2, ok = slice[1].Values["StringValue"]
+	stringValue2, ok = slice[1]["StringValue"]
 	a.True(ok, "'StringValue2' must exist")
 	a.Equal("Some other text", stringValue2, "'StringValue2' value must be 'Some other text'")
 }
@@ -742,12 +742,12 @@ func Test_MapFromChildMustNotOverwriteMapOptionsFromSlice(t *testing.T) {
 	a.True(ok, "'testSlice' must exist")
 
 	var age1 interface{}
-	age1, ok = slice[0].Values["age"]
+	age1, ok = slice[0]["age"]
 	a.True(ok, "'age1' must exist")
 	a.Equal(49, age1, "'age1' value must be '49'")
 
 	var age2 interface{}
-	age2, ok = slice[1].Values["age"]
+	age2, ok = slice[1]["age"]
 	a.True(ok, "'age2' must exist")
 	a.Equal(36, age2, "'age2' value must be '36'")
 }
@@ -782,19 +782,19 @@ func Test_MapFromChildMustMustNotIncludeExcludedFieldsFromSlice(t *testing.T) {
 	slice, ok := resource.Values["testSlice"].([]MappedData)
 	a.True(ok, "'testSlice' must exist")
 
-	_, ok = slice[0].Values["IntValue"]
+	_, ok = slice[0]["IntValue"]
 	a.False(ok, "'IntValue' must not exist")
 
 	var stringValue1 interface{}
-	stringValue1, ok = slice[0].Values["StringValue"]
+	stringValue1, ok = slice[0]["StringValue"]
 	a.True(ok, "'StringValue1' must exist")
 	a.Equal("Some test text", stringValue1, "'StringValue1' value must be 'Some test text'")
 
-	_, ok = slice[1].Values["IntValue"]
+	_, ok = slice[1]["IntValue"]
 	a.False(ok, "'IntValue' must not exist")
 
 	var stringValue2 interface{}
-	stringValue2, ok = slice[1].Values["StringValue"]
+	stringValue2, ok = slice[1]["StringValue"]
 	a.True(ok, "'StringValue2' must exist")
 	a.Equal("Some other text", stringValue2, "'StringValue2' value must be 'Some other text'")
 }
@@ -829,16 +829,16 @@ func Test_MustBeAbleToMapChildStruct(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	rd, ok := resource.Values["ChildStruct"].(MappedData)
+	md, ok := resource.Values["ChildStruct"].(MappedData)
 	a.True(ok, "'ChildStruct' must exist")
 
 	var intValue interface{}
-	intValue, ok = rd.Values["IntValue"]
+	intValue, ok = md["IntValue"]
 	a.True(ok, "'IntValue1' must exist")
 	a.Equal(982, intValue, "'intValue' value must be '982'")
 
 	var stringValue interface{}
-	stringValue, ok = rd.Values["StringValue"]
+	stringValue, ok = md["StringValue"]
 	a.True(ok, "'StringValue' must exist")
 	a.Equal("Some test text", stringValue, "'StringValue' value must be 'Some test text'")
 }
@@ -864,11 +864,11 @@ func Test_MustBeAbleToRenameFieldsInChildStruct(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	rd, ok := resource.Values["ChildStruct"].(MappedData)
+	md, ok := resource.Values["ChildStruct"].(MappedData)
 	a.True(ok, "'ChildStruct' must exist")
 
 	var intValue1 interface{}
-	intValue1, ok = rd.Values["age"]
+	intValue1, ok = md["age"]
 	a.True(ok, "'age' must exist")
 	a.Equal(45, intValue1, "'age' value must be '45'")
 }
@@ -917,22 +917,22 @@ func Test_MustBeAbleToMapChildSlice(t *testing.T) {
 	a.True(ok, "'Slice' must exist")
 
 	var intValue1 interface{}
-	intValue1, ok = slice[0].Values["IntValue"]
+	intValue1, ok = slice[0]["IntValue"]
 	a.True(ok, "'IntValue1' must exist")
 	a.Equal(982, intValue1, "'IntValue1' value must be '982'")
 
 	var stringValue1 interface{}
-	stringValue1, ok = slice[0].Values["StringValue"]
+	stringValue1, ok = slice[0]["StringValue"]
 	a.True(ok, "'StringValue1' must exist")
 	a.Equal("Some test text", stringValue1, "'StringValue1' value must be 'Some test text'")
 
 	var intValue2 interface{}
-	intValue2, ok = slice[1].Values["IntValue"]
+	intValue2, ok = slice[1]["IntValue"]
 	a.True(ok, "'IntValue2' must exist")
 	a.Equal(123, intValue2, "'IntValue2' value must be '123'")
 
 	var stringValue2 interface{}
-	stringValue2, ok = slice[1].Values["StringValue"]
+	stringValue2, ok = slice[1]["StringValue"]
 	a.True(ok, "'StringValue2' must exist")
 	a.Equal("Some other text", stringValue2, "'StringValue2' value must be 'Some other text'")
 }
@@ -968,7 +968,7 @@ func Test_MustBeAbleToRenameFieldsInChildSlice(t *testing.T) {
 	a.True(ok, "'Slice' must exist")
 
 	var intValue1 interface{}
-	intValue1, ok = slice[0].Values["age"]
+	intValue1, ok = slice[0]["age"]
 	a.True(ok, "'age' must exist")
 	a.Equal(45, intValue1, "'age' value must be '45'")
 }
@@ -1007,12 +1007,12 @@ func Test_MustBeAbleToMapAllInChildSlice(t *testing.T) {
 	a.True(ok, "'Slice' must exist")
 
 	var stringValue interface{}
-	stringValue, ok = slice[0].Values["StringValue"]
+	stringValue, ok = slice[0]["StringValue"]
 	a.True(ok, "'StringValue' must exist")
 	a.Equal("test text", stringValue, "'StringValue' value must be 'test text'")
 
 	var intValue interface{}
-	intValue, ok = slice[0].Values["IntValue"]
+	intValue, ok = slice[0]["IntValue"]
 	a.True(ok, "'IntValue' must exist")
 	a.Equal(45, intValue, "'IntValue' value must be '45'")
 }
@@ -1093,44 +1093,44 @@ func Test_MustBeAbleToHandleNestedChildren(t *testing.T) {
 	a.True(ok, "'Level1' must exist")
 
 	var level2Slice []MappedData
-	level2Slice, ok = level1Slice[0].Values["Level2"].([]MappedData)
+	level2Slice, ok = level1Slice[0]["Level2"].([]MappedData)
 	a.True(ok, "'Level2' must exist")
 
 	var stringValue1 interface{}
-	stringValue1, ok = level2Slice[0].Values["StringValue"]
+	stringValue1, ok = level2Slice[0]["StringValue"]
 	a.True(ok, "'stringValue1' must exist")
 	a.Equal("test text 1", stringValue1, "'stringValue1' value must be 'test text 1'")
 
 	var stringValue2 interface{}
-	stringValue2, ok = level2Slice[1].Values["StringValue"]
+	stringValue2, ok = level2Slice[1]["StringValue"]
 	a.True(ok, "'stringValue2' must exist")
 	a.Equal("test text 2", stringValue2, "'stringValue2' value must be 'test text 2'")
 
 	var firstLevel3Slice []MappedData
-	firstLevel3Slice, ok = level2Slice[0].Values["Level3"].([]MappedData)
+	firstLevel3Slice, ok = level2Slice[0]["Level3"].([]MappedData)
 	a.True(ok, "'firstLevel3Slice' must exist")
 
 	var nestedIntValue1 interface{}
-	nestedIntValue1, ok = firstLevel3Slice[0].Values["IntValue"]
+	nestedIntValue1, ok = firstLevel3Slice[0]["IntValue"]
 	a.True(ok, "'nestedIntValue1' must exist")
 	a.Equal(45, nestedIntValue1, "'nestedIntValue1' value must be '45'")
 
 	var nestedIntValue2 interface{}
-	nestedIntValue2, ok = firstLevel3Slice[1].Values["IntValue"]
+	nestedIntValue2, ok = firstLevel3Slice[1]["IntValue"]
 	a.True(ok, "'nestedIntValue2' must exist")
 	a.Equal(47, nestedIntValue2, "'nestedIntValue2' value must be '47'")
 
 	var secondLevel3Slice []MappedData
-	secondLevel3Slice, ok = level2Slice[1].Values["Level3"].([]MappedData)
+	secondLevel3Slice, ok = level2Slice[1]["Level3"].([]MappedData)
 	a.True(ok, "'secondLevel3Slice' must exist")
 
 	var nestedIntValue3 interface{}
-	nestedIntValue3, ok = secondLevel3Slice[0].Values["IntValue"]
+	nestedIntValue3, ok = secondLevel3Slice[0]["IntValue"]
 	a.True(ok, "'nestedIntValue3' must exist")
 	a.Equal(854, nestedIntValue3, "'nestedIntValue3' value must be '854'")
 
 	var nestedIntValue4 interface{}
-	nestedIntValue4, ok = secondLevel3Slice[1].Values["IntValue"]
+	nestedIntValue4, ok = secondLevel3Slice[1]["IntValue"]
 	a.True(ok, "'nestedIntValue4' must exist")
 	a.Equal(234, nestedIntValue4, "'nestedIntValue4' value must be '234'")
 

@@ -30,6 +30,6 @@ func Test_MarshalingMustEncodeAllProperties(t *testing.T) {
 	//assert
 	a := assert.New(t)
 	a.True(ok)
-	expectedJson := `{"isAvailable":true,"name":"widget","price":45.2531,"quantity":15}`
+	expectedJson := `{"IsAvailable":true,"Name":"widget","Price":45.2531,"Quantity":15}`
 	a.Equal(expectedJson, string(json), "json not created properly.")
 }

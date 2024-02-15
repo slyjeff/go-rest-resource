@@ -1,16 +1,14 @@
 package resource
 
 type Resource struct {
-	MappedData
+	Values MappedData
 }
 
-type MappedData struct {
-	Values map[string]interface{}
-}
+type MappedData map[string]interface{}
 
-func (md *MappedData) AddData(fieldName string, value interface{}) {
-	if md.Values == nil {
-		md.Values = make(map[string]interface{})
+func (r *Resource) addData(fieldName string, value interface{}) {
+	if r.Values == nil {
+		r.Values = make(map[string]interface{})
 	}
-	md.Values[fieldName] = value
+	r.Values[fieldName] = value
 }

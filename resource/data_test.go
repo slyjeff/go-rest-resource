@@ -98,17 +98,17 @@ func Test_DataMustTransformStructToMap(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	m, ok := resource.Values["testStruct"].(MappedData)
+	md, ok := resource.Values["testStruct"].(MappedData)
 	a.True(ok, "'testStruct' must be found in values.")
 
 	var intValue interface{}
-	intValue, ok = m.Values["IntValue"]
+	intValue, ok = md["IntValue"]
 
 	a.True(ok, "'IntValue' must be int 'testStruct'.")
 	a.Equal(982, intValue, "'IntValue' value must be '982'.")
 
 	var stringValue interface{}
-	stringValue, ok = m.Values["StringValue"]
+	stringValue, ok = md["StringValue"]
 
 	a.True(ok, "'StringValue' must be int 'testStruct'.")
 	a.Equal("Some test text.", stringValue, "'StringValue' value must be 'Some text'.")
@@ -173,22 +173,22 @@ func Test_DatMustTransformStructsToResourceMapsInSlices(t *testing.T) {
 	a.True(ok, "'structs' must be found in values.")
 
 	var intValue1 interface{}
-	intValue1, ok = slice[0].Values["IntValue"]
+	intValue1, ok = slice[0]["IntValue"]
 	a.True(ok, "'IntValue' must be found in first testMap.")
 	a.Equal(43, intValue1, "'IntValue' must be '43'.")
 
 	var stringValue1 interface{}
-	stringValue1, ok = slice[0].Values["StringValue"]
+	stringValue1, ok = slice[0]["StringValue"]
 	a.True(ok, "'StringValue' must be found in first testMap.")
 	a.Equal("test 1", stringValue1, "'StringValue' must be 'test 1'.")
 
 	var intValue2 interface{}
-	intValue2, ok = slice[1].Values["IntValue"]
+	intValue2, ok = slice[1]["IntValue"]
 	a.True(ok, "'IntValue' must be found in second testMap.")
 	a.Equal(367, intValue2, "'IntValue' must be '367'.")
 
 	var stringValue2 interface{}
-	stringValue2, ok = slice[1].Values["StringValue"]
+	stringValue2, ok = slice[1]["StringValue"]
 	a.True(ok, "'StringValue' must be found in second testMap.")
 	a.Equal("test 2", stringValue2, "'StringValue' must be 'test 2'.")
 }

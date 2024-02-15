@@ -29,12 +29,15 @@ func newConfigureMap(r *Resource, copyPairs ...copyPair) ConfigureMap {
 }
 
 func (r *Resource) MapChild(fieldName string, source interface{}) *ConfigureMap {
+	if r.Values == nil {
+		r.Values = make(MappedData)
+	}
 	sourceItems, ok := source.([]interface{})
 	if ok {
-		return mapChildSlice(r, &r.MappedData, fieldName, sourceItems)
+		return mapChildSlice(r, &r.Values, fieldName, sourceItems)
 	}
 
-	return mapChildStruct(r, &r.MappedData, fieldName, source)
+	return mapChildStruct(r, &r.Values, fieldName, source)
 }
 
 func (r *Resource) MapAllDataFrom(source interface{}) *Resource {
@@ -42,7 +45,10 @@ func (r *Resource) MapAllDataFrom(source interface{}) *Resource {
 }
 
 func (r *Resource) MapDataFrom(source interface{}) *ConfigureMap {
-	configuration := newConfigureMap(r, newSingleCopyPair(source, &r.MappedData))
+	if r.Values == nil {
+		r.Values = make(MappedData)
+	}
+	configuration := newConfigureMap(r, newSingleCopyPair(source, &r.Values))
 	return &configuration
 }
 
@@ -67,8 +73,8 @@ func (cm *ConfigureMap) MapWithOptions(fieldName string, mapOptions MapOptions) 
 
 	for _, copyPair := range cm.copyPairs {
 		for i, v := range copyPair.sourceItems {
-			resourceData := copyPair.destinationItems[i]
-			if _, ok := resourceData.Values[fieldName]; ok {
+			resourceData := *copyPair.destinationItems[i]
+			if _, ok := resourceData[fieldName]; ok {
 				continue
 			}
 
@@ -78,7 +84,7 @@ func (cm *ConfigureMap) MapWithOptions(fieldName string, mapOptions MapOptions) 
 				value = FormattedData{value, mapOptions.FormatCallback}
 			}
 
-			resourceData.AddData(name, value)
+			resourceData[name] = value
 		}
 	}
 
@@ -90,16 +96,16 @@ func (cm *ConfigureMap) MapChild(fieldName string) *ConfigureMap {
 
 	for _, cp := range cm.copyPairs {
 		for i, v := range cp.sourceItems {
-			md := cp.destinationItems[i]
+			md := *cp.destinationItems[i]
 			source := getValueByName(v, fieldName)
 			sourceItems, ok := source.([]interface{})
 			if ok {
 				destinationItems := make([]MappedData, len(sourceItems))
 				for i := range sourceItems {
-					destinationItems[i] = MappedData{make(map[string]interface{})}
+					destinationItems[i] = make(MappedData)
 				}
 
-				md.AddData(fieldName, destinationItems)
+				md[fieldName] = destinationItems
 
 				destinationPointers := make([]*MappedData, len(destinationItems))
 				for i := range destinationItems {
@@ -110,8 +116,8 @@ func (cm *ConfigureMap) MapChild(fieldName string) *ConfigureMap {
 				continue
 			}
 
-			destinationItem := MappedData{make(map[string]interface{})}
-			md.AddData(fieldName, destinationItem)
+			destinationItem := make(MappedData)
+			md[fieldName] = destinationItem
 			copyPairs = append(copyPairs, newSingleCopyPair(source, &destinationItem))
 		}
 	}
@@ -123,10 +129,10 @@ func (cm *ConfigureMap) MapChild(fieldName string) *ConfigureMap {
 func mapChildSlice(r *Resource, md *MappedData, fieldName string, sourceItems []interface{}) *ConfigureMap {
 	destinationItems := make([]MappedData, len(sourceItems))
 	for i := range sourceItems {
-		destinationItems[i] = MappedData{make(map[string]interface{})}
+		destinationItems[i] = make(MappedData)
 	}
 
-	md.AddData(fieldName, destinationItems)
+	(*md)[fieldName] = destinationItems
 
 	destinationPointers := make([]*MappedData, len(destinationItems))
 	for i := range destinationItems {
@@ -140,8 +146,8 @@ func mapChildSlice(r *Resource, md *MappedData, fieldName string, sourceItems []
 }
 
 func mapChildStruct(r *Resource, md *MappedData, fieldName string, source interface{}) *ConfigureMap {
-	childResourceData := MappedData{Values: make(map[string]interface{})}
-	md.AddData(fieldName, childResourceData)
+	childResourceData := make(MappedData)
+	(*md)[fieldName] = childResourceData
 
 	cm := newConfigureMap(r, newSingleCopyPair(source, &childResourceData))
 	return &cm
@@ -176,12 +182,12 @@ func (cm *ConfigureMap) Exclude(fieldName string) *ConfigureMap {
 
 	for _, copyPair := range cm.copyPairs {
 		for i, v := range copyPair.sourceItems {
-			resourceData := copyPair.destinationItems[i]
+			resourceData := *copyPair.destinationItems[i]
 
 			value := getValueByName(v, fieldName)
 			value = createResourceData(value)
 
-			delete(resourceData.Values, fieldName)
+			delete(resourceData, fieldName)
 		}
 	}
 

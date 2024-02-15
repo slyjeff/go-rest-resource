@@ -6,13 +6,13 @@ import (
 
 func (r *Resource) Data(name string, value interface{}) *Resource {
 	value = createResourceData(value)
-	r.AddData(name, value)
+	r.addData(name, value)
 	return r
 }
 
 func (r *Resource) FormattedData(name string, value interface{}, callback FormatDataCallback) *Resource {
 	fd := FormattedData{value, callback}
-	r.AddData(name, fd)
+	r.addData(name, fd)
 	return r
 }
 
@@ -66,13 +66,13 @@ func createResourceSlice(value interface{}) interface{} {
 }
 
 func createResourceMap(value interface{}) MappedData {
-	var rm MappedData
+	rm := make(MappedData)
 
 	t := reflect.TypeOf(value)
 	v := reflect.ValueOf(value)
 	for i := 0; i < t.NumField(); i++ {
 		v := createResourceData(v.Field(i).Interface())
-		rm.AddData(t.Field(i).Name, v)
+		rm[t.Field(i).Name] = v
 	}
 
 	return rm
