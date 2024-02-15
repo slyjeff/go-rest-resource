@@ -1,20 +1,15 @@
-package resource
-
-type MapOptions struct {
-	Name           string
-	FormatCallback FormatDataCallback
-}
+package mapping
 
 type MapOption struct {
 	option string
 	value  string
 }
 
-func RenameField(name string) MapOption {
+func Rename(name string) MapOption {
 	return MapOption{"name", name}
 }
 
-func FormatField(formatString string) MapOption {
+func Format(formatString string) MapOption {
 	return MapOption{"format", formatString}
 }
 

@@ -5,8 +5,6 @@ import (
 	"reflect"
 )
 
-type FormatDataCallback func(v interface{}) string
-
 type FormattedData struct {
 	Value  interface{}
 	format string

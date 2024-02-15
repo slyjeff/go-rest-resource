@@ -1,6 +1,7 @@
 package resource
 
 import (
+	"github.com/slyjeff/rest-resource/resource/mapping"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -41,7 +42,7 @@ func Test_FormattedDataAddValueAndFormattingInformation(t *testing.T) {
 	var resource Resource
 
 	//act
-	resource.Data("number", number, FormatField("%.02f"))
+	resource.Data("number", number, mapping.Format("%.02f"))
 
 	//assert
 	a := assert.New(t)
@@ -102,14 +103,38 @@ func Test_DataMustTransformStructToMap(t *testing.T) {
 	var intValue interface{}
 	intValue, ok = md["IntValue"]
 
-	a.True(ok, "'IntValue' must be int 'testStruct'.")
+	a.True(ok, "'IntValue' must be in 'testStruct'.")
 	a.Equal(982, intValue, "'IntValue' value must be '982'.")
 
 	var stringValue interface{}
 	stringValue, ok = md["StringValue"]
 
-	a.True(ok, "'StringValue' must be int 'testStruct'.")
+	a.True(ok, "'StringValue' must be in 'testStruct'.")
 	a.Equal("Some test text.", stringValue, "'StringValue' value must be 'Some text'.")
+}
+
+func Test_DataMustNotMapPrivateFields(t *testing.T) {
+	//arrange
+	testStruct := struct {
+		IntValue    int
+		stringValue string
+	}{
+		IntValue:    982,
+		stringValue: "Some test text.",
+	}
+
+	var resource Resource
+
+	//act
+	resource.Data("testStruct", testStruct)
+
+	//assert
+	a := assert.New(t)
+	md, ok := resource.Values["testStruct"].(MappedData)
+	a.True(ok, "'testStruct' must be found in values.")
+
+	_, ok = md["stringValue"]
+	a.False(ok, "'stringValue' must be in 'testStruct'.")
 }
 
 func Test_DataMustAddSliceToResource(t *testing.T) {

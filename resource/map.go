@@ -1,6 +1,7 @@
 package resource
 
 import (
+	"github.com/slyjeff/rest-resource/resource/mapping"
 	"reflect"
 	"slices"
 )
@@ -52,9 +53,9 @@ func (r *Resource) MapDataFrom(source interface{}) *ConfigureMap {
 	return &configuration
 }
 
-func (cm *ConfigureMap) Map(fieldName string, mapOptions ...MapOption) *ConfigureMap {
+func (cm *ConfigureMap) Map(fieldName string, mapOptions ...mapping.MapOption) *ConfigureMap {
 	name := fieldName
-	if newName, ok := FindNameOption(mapOptions); ok {
+	if newName, ok := mapping.FindNameOption(mapOptions); ok {
 		name = newName
 	}
 
@@ -68,7 +69,7 @@ func (cm *ConfigureMap) Map(fieldName string, mapOptions ...MapOption) *Configur
 			value := getValueByName(v, fieldName)
 			value = createResourceData(value)
 
-			if format, ok := FindFormatOption(mapOptions); ok {
+			if format, ok := mapping.FindFormatOption(mapOptions); ok {
 				value = FormattedData{value, format}
 			}
 
