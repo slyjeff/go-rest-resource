@@ -1,7 +1,6 @@
 package resource
 
 import (
-	"fmt"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -40,10 +39,9 @@ func Test_FormattedDataAddValueAndFormattingInformation(t *testing.T) {
 	//arrange
 	number := 4234.3982
 	var resource Resource
-	formatToTwoDecimals := func(v interface{}) string { return fmt.Sprintf("%.02f", v) }
 
 	//act
-	resource.FormattedData("number", number, formatToTwoDecimals)
+	resource.Data("number", number, FormatField("%.02f"))
 
 	//assert
 	a := assert.New(t)

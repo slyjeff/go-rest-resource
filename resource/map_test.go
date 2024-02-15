@@ -1,7 +1,6 @@
 package resource
 
 import (
-	"fmt"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -93,11 +92,9 @@ func Test_MapDataFromSupportFormattedData(t *testing.T) {
 
 	var resource Resource
 
-	formatToTwoDecimals := func(v interface{}) string { return fmt.Sprintf("%.02f", v) }
-
 	//act
 	resource.MapDataFrom(testStruct).
-		MapWithOptions("FloatValue", MapOptions{FormatCallback: formatToTwoDecimals})
+		Map("FloatValue", FormatField("%.02f"))
 
 	//assert
 	a := assert.New(t)
@@ -124,7 +121,7 @@ func Test_MapDataFromSupportRenaming(t *testing.T) {
 
 	//act
 	resource.MapDataFrom(testStruct).
-		MapWithOptions("Value", MapOptions{Name: "coolValue"})
+		Map("Value", RenameField("coolValue"))
 
 	//assert
 	a := assert.New(t)
@@ -205,11 +202,9 @@ func Test_MapAllMustNotOverwriteMapOptions(t *testing.T) {
 
 	var resource Resource
 
-	formatToTwoDecimals := func(v interface{}) string { return fmt.Sprintf("%.02f", v) }
-
 	//act
 	resource.MapDataFrom(testStruct).
-		MapWithOptions("FloatValue", MapOptions{FormatCallback: formatToTwoDecimals}).
+		Map("FloatValue", FormatField("%.02f")).
 		MapAll()
 
 	//assert
@@ -399,7 +394,7 @@ func Test_MapFromChildMustAllowRenamingOfFieldsFromStruct(t *testing.T) {
 
 	//act
 	resource.MapChild("testStruct", testStruct).
-		MapWithOptions("IntValue", MapOptions{Name: "age"})
+		Map("IntValue", RenameField("age"))
 
 	//assert
 	a := assert.New(t)
@@ -422,11 +417,9 @@ func Test_MapFromChildMustAllowFormattingOfFieldsFromStruct(t *testing.T) {
 
 	var resource Resource
 
-	formatToTwoDecimals := func(v interface{}) string { return fmt.Sprintf("%.02f", v) }
-
 	//act
 	resource.MapChild("testStruct", testStruct).
-		MapWithOptions("FloatValue", MapOptions{FormatCallback: formatToTwoDecimals})
+		Map("FloatValue", FormatField("%.02f"))
 
 	//assert
 	a := assert.New(t)
@@ -491,7 +484,7 @@ func Test_MapFromChildMustNotOverwriteMapOptionsFromStruct(t *testing.T) {
 
 	//act
 	resource.MapChild("testStruct", testStruct).
-		MapWithOptions("IntValue", MapOptions{Name: "age"}).
+		Map("IntValue", RenameField("age")).
 		MapAll()
 
 	//assert
@@ -610,7 +603,7 @@ func Test_MapFromChildMustAllowRenamingOfFieldsFromSlice(t *testing.T) {
 
 	//act
 	resource.MapChild("testSlice", testSlice).
-		MapWithOptions("IntValue", MapOptions{Name: "age"})
+		Map("IntValue", RenameField("age"))
 
 	//assert
 	a := assert.New(t)
@@ -638,11 +631,9 @@ func Test_MapFromChildMustAllowFormattingOfFieldsFromSlice(t *testing.T) {
 
 	var resource Resource
 
-	formatToTwoDecimals := func(v interface{}) string { return fmt.Sprintf("%.02f", v) }
-
 	//act
 	resource.MapChild("testSlice", testSlice).
-		MapWithOptions("FloatValue", MapOptions{FormatCallback: formatToTwoDecimals})
+		Map("FloatValue", FormatField("%.02f"))
 
 	//assert
 	a := assert.New(t)
@@ -733,7 +724,7 @@ func Test_MapFromChildMustNotOverwriteMapOptionsFromSlice(t *testing.T) {
 
 	//act
 	resource.MapChild("testSlice", testSlice).
-		MapWithOptions("IntValue", MapOptions{Name: "age"}).
+		Map("IntValue", RenameField("age")).
 		MapAll()
 
 	//assert
@@ -860,7 +851,7 @@ func Test_MustBeAbleToRenameFieldsInChildStruct(t *testing.T) {
 	//act
 	resource.MapDataFrom(testStruct).
 		MapChild("ChildStruct").
-		MapWithOptions("IntValue", MapOptions{Name: "age"})
+		Map("IntValue", RenameField("age"))
 
 	//assert
 	a := assert.New(t)
@@ -960,7 +951,7 @@ func Test_MustBeAbleToRenameFieldsInChildSlice(t *testing.T) {
 	//act
 	resource.MapDataFrom(testStruct).
 		MapChild("Slice").
-		MapWithOptions("IntValue", MapOptions{Name: "age"})
+		Map("IntValue", RenameField("age"))
 
 	//assert
 	a := assert.New(t)

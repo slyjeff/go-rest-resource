@@ -4,15 +4,13 @@ import (
 	"reflect"
 )
 
-func (r *Resource) Data(name string, value interface{}) *Resource {
-	value = createResourceData(value)
-	r.addData(name, value)
-	return r
-}
+func (r *Resource) Data(name string, value interface{}, mapOptions ...MapOption) *Resource {
+	if format, ok := FindFormatOption(mapOptions); ok {
+		r.addData(name, FormattedData{value, format})
+	} else {
+		r.addData(name, createResourceData(value))
+	}
 
-func (r *Resource) FormattedData(name string, value interface{}, callback FormatDataCallback) *Resource {
-	fd := FormattedData{value, callback}
-	r.addData(name, fd)
 	return r
 }
 

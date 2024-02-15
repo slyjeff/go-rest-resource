@@ -52,23 +52,10 @@ func (r *Resource) MapDataFrom(source interface{}) *ConfigureMap {
 	return &configuration
 }
 
-type MapOptions struct {
-	Name           string
-	FormatCallback FormatDataCallback
-}
-
-func (cm *ConfigureMap) Map(fieldName string) *ConfigureMap {
-	cm.MapWithOptions(fieldName, MapOptions{})
-
-	return cm
-}
-
-func (cm *ConfigureMap) MapWithOptions(fieldName string, mapOptions MapOptions) *ConfigureMap {
-	var name string
-	if mapOptions.Name == "" {
-		name = fieldName
-	} else {
-		name = mapOptions.Name
+func (cm *ConfigureMap) Map(fieldName string, mapOptions ...MapOption) *ConfigureMap {
+	name := fieldName
+	if newName, ok := FindNameOption(mapOptions); ok {
+		name = newName
 	}
 
 	for _, copyPair := range cm.copyPairs {
@@ -80,8 +67,9 @@ func (cm *ConfigureMap) MapWithOptions(fieldName string, mapOptions MapOptions) 
 
 			value := getValueByName(v, fieldName)
 			value = createResourceData(value)
-			if mapOptions.FormatCallback != nil {
-				value = FormattedData{value, mapOptions.FormatCallback}
+
+			if format, ok := FindFormatOption(mapOptions); ok {
+				value = FormattedData{value, format}
 			}
 
 			resourceData[name] = value
@@ -172,7 +160,7 @@ func (cm *ConfigureMap) MapAll() *ConfigureMap {
 			continue
 		}
 
-		cm.MapWithOptions(fieldName, MapOptions{})
+		cm.Map(fieldName)
 	}
 	return cm
 }
