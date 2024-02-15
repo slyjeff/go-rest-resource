@@ -1,4 +1,4 @@
-package GoRestResource
+package resource
 
 import (
 	"reflect"
@@ -14,5 +14,5 @@ func getValueByName(source interface{}, fieldName string) interface{} {
 		return nil
 	}
 
-	return value.Interface() //, true
+	return value.Interface()
 }

@@ -1,4 +1,4 @@
-package GoRestResource
+package resource
 
 import (
 	"fmt"
@@ -98,7 +98,7 @@ func Test_DataMustTransformStructToMap(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	m, ok := resource.Values["testStruct"].(ResourceData)
+	m, ok := resource.Values["testStruct"].(MappedData)
 	a.True(ok, "'testStruct' must be found in values.")
 
 	var intValue interface{}
@@ -169,7 +169,7 @@ func Test_DatMustTransformStructsToResourceMapsInSlices(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	slice, ok := resource.Values["structs"].([]ResourceData)
+	slice, ok := resource.Values["structs"].([]MappedData)
 	a.True(ok, "'structs' must be found in values.")
 
 	var intValue1 interface{}

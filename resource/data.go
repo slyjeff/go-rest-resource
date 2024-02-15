@@ -1,4 +1,4 @@
-package GoRestResource
+package resource
 
 import (
 	"reflect"
@@ -47,7 +47,7 @@ func createResourceSlice(value interface{}) interface{} {
 
 	firstItem := v.Index(0).Interface()
 	if reflect.TypeOf(firstItem).Kind() == reflect.Struct {
-		slice := make([]ResourceData, l)
+		slice := make([]MappedData, l)
 
 		for i := 0; i < l; i++ {
 			slice[i] = createResourceMap(v.Index(i).Interface())
@@ -65,8 +65,8 @@ func createResourceSlice(value interface{}) interface{} {
 	return slice
 }
 
-func createResourceMap(value interface{}) ResourceData {
-	var rm ResourceData
+func createResourceMap(value interface{}) MappedData {
+	var rm MappedData
 
 	t := reflect.TypeOf(value)
 	v := reflect.ValueOf(value)

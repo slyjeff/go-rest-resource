@@ -1,4 +1,4 @@
-package GoRestResource
+package resource
 
 import (
 	"fmt"
@@ -168,6 +168,29 @@ func Test_MapDataFromMustSupportMapAll(t *testing.T) {
 	a.Equal(false, boolValue, "'BoolValue' value must be false.")
 }
 
+func Test_MapAllMustSkipPrivateFields(t *testing.T) {
+	//arrange
+	testStruct := struct {
+		IntValue    int
+		stringValue string
+		BoolValue   bool
+	}{
+		IntValue:    982,
+		stringValue: "Some test text.",
+		BoolValue:   false,
+	}
+
+	var resource Resource
+
+	//act
+	resource.MapDataFrom(testStruct).MapAll()
+
+	//assert
+	a := assert.New(t)
+	_, ok := resource.Values["stringValue"]
+	a.False(ok, "'stringValue' must not exist")
+}
+
 func Test_MapAllMustNotOverwriteMapOptions(t *testing.T) {
 	//arrange
 	testStruct := struct {
@@ -302,7 +325,7 @@ func Test_MustBeAbleToMapSliceMappingAStruct(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	slice, ok := resource.Values["Slice"].([]ResourceData)
+	slice, ok := resource.Values["Slice"].([]MappedData)
 	a.True(ok, "'Slice' must exist")
 
 	var intValue1 interface{}
@@ -347,7 +370,7 @@ func Test_MapFromChildMustMapIndicatedFieldsFromStruct(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	rd, ok := resource.Values["testStruct"].(ResourceData)
+	rd, ok := resource.Values["testStruct"].(MappedData)
 	a.True(ok, "'testStruct' must exist")
 
 	var intValue interface{}
@@ -380,7 +403,7 @@ func Test_MapFromChildMustAllowRenamingOfFieldsFromStruct(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	rd, ok := resource.Values["testStruct"].(ResourceData)
+	rd, ok := resource.Values["testStruct"].(MappedData)
 	a.True(ok, "'testStruct' must exist")
 
 	var intValue1 interface{}
@@ -407,7 +430,7 @@ func Test_MapFromChildMustAllowFormattingOfFieldsFromStruct(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	rd, ok := resource.Values["testStruct"].(ResourceData)
+	rd, ok := resource.Values["testStruct"].(MappedData)
 	a.True(ok, "'testStruct' must exist")
 
 	var floatValue interface{}
@@ -440,7 +463,7 @@ func Test_MapFromChildMustSupportMapAllFromStruct(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	rd, ok := resource.Values["testStruct"].(ResourceData)
+	rd, ok := resource.Values["testStruct"].(MappedData)
 	a.True(ok, "'testStruct' must exist")
 
 	var intValue interface{}
@@ -473,7 +496,7 @@ func Test_MapFromChildMustNotOverwriteMapOptionsFromStruct(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	rd, ok := resource.Values["testStruct"].(ResourceData)
+	rd, ok := resource.Values["testStruct"].(MappedData)
 	a.True(ok, "'testStruct' must exist")
 
 	var age interface{}
@@ -501,7 +524,7 @@ func Test_MapFromChildMustMustNotIncludeExcludedFieldsFromStruct(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	rd, ok := resource.Values["testStruct"].(ResourceData)
+	rd, ok := resource.Values["testStruct"].(MappedData)
 	a.True(ok, "'testStruct' must exist")
 
 	_, ok = rd.Values["IntValue"]
@@ -543,7 +566,7 @@ func Test_MapFromChildMustMapIndicatedFieldsFromSlice(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	slice, ok := resource.Values["testSlice"].([]ResourceData)
+	slice, ok := resource.Values["testSlice"].([]MappedData)
 	a.True(ok, "'testSlice' must exist")
 
 	var intValue1 interface{}
@@ -591,7 +614,7 @@ func Test_MapFromChildMustAllowRenamingOfFieldsFromSlice(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	slice, ok := resource.Values["testSlice"].([]ResourceData)
+	slice, ok := resource.Values["testSlice"].([]MappedData)
 	a.True(ok, "'testSlice' must exist")
 
 	var intValue1 interface{}
@@ -623,7 +646,7 @@ func Test_MapFromChildMustAllowFormattingOfFieldsFromSlice(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	slice, ok := resource.Values["testSlice"].([]ResourceData)
+	slice, ok := resource.Values["testSlice"].([]MappedData)
 	a.True(ok, "'testSlice' must exist")
 
 	var floatValue interface{}
@@ -664,7 +687,7 @@ func Test_MapFromChildMustSupportMapAllFromSlice(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	slice, ok := resource.Values["testSlice"].([]ResourceData)
+	slice, ok := resource.Values["testSlice"].([]MappedData)
 	a.True(ok, "'testSlice' must exist")
 
 	var intValue1 interface{}
@@ -715,7 +738,7 @@ func Test_MapFromChildMustNotOverwriteMapOptionsFromSlice(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	slice, ok := resource.Values["testSlice"].([]ResourceData)
+	slice, ok := resource.Values["testSlice"].([]MappedData)
 	a.True(ok, "'testSlice' must exist")
 
 	var age1 interface{}
@@ -756,7 +779,7 @@ func Test_MapFromChildMustMustNotIncludeExcludedFieldsFromSlice(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	slice, ok := resource.Values["testSlice"].([]ResourceData)
+	slice, ok := resource.Values["testSlice"].([]MappedData)
 	a.True(ok, "'testSlice' must exist")
 
 	_, ok = slice[0].Values["IntValue"]
@@ -806,7 +829,7 @@ func Test_MustBeAbleToMapChildStruct(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	rd, ok := resource.Values["ChildStruct"].(ResourceData)
+	rd, ok := resource.Values["ChildStruct"].(MappedData)
 	a.True(ok, "'ChildStruct' must exist")
 
 	var intValue interface{}
@@ -841,7 +864,7 @@ func Test_MustBeAbleToRenameFieldsInChildStruct(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	rd, ok := resource.Values["ChildStruct"].(ResourceData)
+	rd, ok := resource.Values["ChildStruct"].(MappedData)
 	a.True(ok, "'ChildStruct' must exist")
 
 	var intValue1 interface{}
@@ -890,7 +913,7 @@ func Test_MustBeAbleToMapChildSlice(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	slice, ok := resource.Values["Slice"].([]ResourceData)
+	slice, ok := resource.Values["Slice"].([]MappedData)
 	a.True(ok, "'Slice' must exist")
 
 	var intValue1 interface{}
@@ -941,7 +964,7 @@ func Test_MustBeAbleToRenameFieldsInChildSlice(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	slice, ok := resource.Values["Slice"].([]ResourceData)
+	slice, ok := resource.Values["Slice"].([]MappedData)
 	a.True(ok, "'Slice' must exist")
 
 	var intValue1 interface{}
@@ -980,7 +1003,7 @@ func Test_MustBeAbleToMapAllInChildSlice(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	slice, ok := resource.Values["Slice"].([]ResourceData)
+	slice, ok := resource.Values["Slice"].([]MappedData)
 	a.True(ok, "'Slice' must exist")
 
 	var stringValue interface{}
@@ -1066,11 +1089,11 @@ func Test_MustBeAbleToHandleNestedChildren(t *testing.T) {
 
 	//assert
 	a := assert.New(t)
-	level1Slice, ok := resource.Values["Level1"].([]ResourceData)
+	level1Slice, ok := resource.Values["Level1"].([]MappedData)
 	a.True(ok, "'Level1' must exist")
 
-	var level2Slice []ResourceData
-	level2Slice, ok = level1Slice[0].Values["Level2"].([]ResourceData)
+	var level2Slice []MappedData
+	level2Slice, ok = level1Slice[0].Values["Level2"].([]MappedData)
 	a.True(ok, "'Level2' must exist")
 
 	var stringValue1 interface{}
@@ -1083,8 +1106,8 @@ func Test_MustBeAbleToHandleNestedChildren(t *testing.T) {
 	a.True(ok, "'stringValue2' must exist")
 	a.Equal("test text 2", stringValue2, "'stringValue2' value must be 'test text 2'")
 
-	var firstLevel3Slice []ResourceData
-	firstLevel3Slice, ok = level2Slice[0].Values["Level3"].([]ResourceData)
+	var firstLevel3Slice []MappedData
+	firstLevel3Slice, ok = level2Slice[0].Values["Level3"].([]MappedData)
 	a.True(ok, "'firstLevel3Slice' must exist")
 
 	var nestedIntValue1 interface{}
@@ -1097,8 +1120,8 @@ func Test_MustBeAbleToHandleNestedChildren(t *testing.T) {
 	a.True(ok, "'nestedIntValue2' must exist")
 	a.Equal(47, nestedIntValue2, "'nestedIntValue2' value must be '47'")
 
-	var secondLevel3Slice []ResourceData
-	secondLevel3Slice, ok = level2Slice[1].Values["Level3"].([]ResourceData)
+	var secondLevel3Slice []MappedData
+	secondLevel3Slice, ok = level2Slice[1].Values["Level3"].([]MappedData)
 	a.True(ok, "'secondLevel3Slice' must exist")
 
 	var nestedIntValue3 interface{}
