@@ -1,4 +1,4 @@
-package slysoft
+package encoding
 
 import (
 	"github.com/slyjeff/rest-resource/resource"

@@ -1,4 +1,4 @@
-package slysoft
+package encoding
 
 import (
 	"encoding/json"

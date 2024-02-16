@@ -2,19 +2,18 @@ package encoding
 
 import (
 	"encoding/xml"
-	"github.com/slyjeff/rest-resource/encoding/slysoft"
 	"github.com/slyjeff/rest-resource/resource"
 )
 
 func ForAcceptHeader(r resource.Resource, headers map[string][]string) (string, string) {
 	if formatAccepted(headers, "application/xml") {
-		if v, err := slysoft.MarshalXml(r); err == nil {
+		if v, err := MarshalXml(r); err == nil {
 			return xml.Header + string(v), "application/xml"
 		}
 		return "", "application/xml"
 	}
 
-	if v, err := slysoft.MarshalJson(r); err == nil {
+	if v, err := MarshalJson(r); err == nil {
 		return string(v), "application/json"
 	}
 	return "", "application/json"
