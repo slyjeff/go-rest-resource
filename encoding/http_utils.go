@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func MarshalResource(r resource.Resource, headers map[string][]string) (string, string) {
+func MarshalResource(headers map[string][]string, r resource.Resource) (string, string) {
 	acceptFormats, _ := headers["Accept"]
 
 	if formatAccepted(acceptFormats, "text/html") {
