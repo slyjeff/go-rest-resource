@@ -113,6 +113,61 @@ func Test_DataMustTransformStructToMap(t *testing.T) {
 	a.Equal("Some test text.", stringValue, "'StringValue' value must be 'Some text'.")
 }
 
+func Test_DataMustTransformStructPointerToMap(t *testing.T) {
+	//arrange
+	testStruct := struct {
+		IntValue    int
+		StringValue string
+	}{
+		IntValue:    982,
+		StringValue: "Some test text.",
+	}
+
+	var resource Resource
+
+	//act
+	resource.Data("testStruct", &testStruct)
+
+	//assert
+	a := assert.New(t)
+	md, ok := resource.Values["testStruct"].(MappedData)
+	a.True(ok, "'testStruct' must be found in values.")
+
+	var intValue interface{}
+	intValue, ok = md["IntValue"]
+
+	a.True(ok, "'IntValue' must be in 'testStruct'.")
+	a.Equal(982, intValue, "'IntValue' value must be '982'.")
+
+	var stringValue interface{}
+	stringValue, ok = md["StringValue"]
+
+	a.True(ok, "'StringValue' must be in 'testStruct'.")
+	a.Equal("Some test text.", stringValue, "'StringValue' value must be 'Some text'.")
+}
+
+func Test_DataMustGracefullyHandleNilPointers(t *testing.T) {
+	//arrange
+	type testStruct struct {
+		IntValue    int
+		StringValue string
+	}
+
+	var testValue *testStruct
+
+	var resource Resource
+
+	//act
+	resource.Data("testValue", testValue)
+
+	//assert
+	a := assert.New(t)
+	md, ok := resource.Values["testValue"].(MappedData)
+	a.True(ok, "'testValue' must be found in values.")
+
+	a.Equal(0, len(md), "'testValue' be an empty mapdata.")
+}
+
 func Test_DataMustNotMapPrivateFields(t *testing.T) {
 	//arrange
 	testStruct := struct {

@@ -14,14 +14,14 @@ func Format(formatString string) MapOption {
 }
 
 func FindNameOption(options []MapOption) (string, bool) {
-	return FindOption(options, "name")
+	return findOption(options, "name")
 }
 
 func FindFormatOption(options []MapOption) (string, bool) {
-	return FindOption(options, "format")
+	return findOption(options, "format")
 }
 
-func FindOption(options []MapOption, option string) (string, bool) {
+func findOption(options []MapOption, option string) (string, bool) {
 	for _, v := range options {
 		if v.option == option {
 			return v.value, true

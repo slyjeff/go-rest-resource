@@ -5,6 +5,7 @@ import (
 	"reflect"
 )
 
+//goland:noinspection GoMixedReceiverTypes
 func (r *Resource) Data(name string, value interface{}, mapOptions ...mapping.MapOption) *Resource {
 	if format, ok := mapping.FindFormatOption(mapOptions); ok {
 		r.addData(name, FormattedData{value, format})
@@ -17,12 +18,19 @@ func (r *Resource) Data(name string, value interface{}, mapOptions ...mapping.Ma
 
 func createResourceData(value interface{}) interface{} {
 	if value == nil {
-		return nil
+		return ""
+	}
+
+	if reflect.TypeOf(value).Kind() == reflect.Pointer {
+		e := reflect.ValueOf(value).Elem()
+		if !e.IsValid() {
+			return make(MappedData)
+		}
+		value = e.Interface()
 	}
 
 	_, ok := value.(FormattedData)
 	if ok {
-
 		return value
 	}
 
