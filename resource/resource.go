@@ -2,10 +2,16 @@ package resource
 
 type Resource struct {
 	Values MappedData
+	Links  map[string]Link
+}
+
+type Link struct {
+	Href string
+	Verb string
 }
 
 func NewResource() Resource {
-	r := Resource{make(map[string]interface{})}
+	r := Resource{make(map[string]interface{}), make(map[string]Link)}
 	return r
 }
 
@@ -17,4 +23,12 @@ func (r *Resource) addData(fieldName string, value interface{}) {
 		r.Values = make(map[string]interface{})
 	}
 	r.Values[fieldName] = value
+}
+
+//goland:noinspection GoMixedReceiverTypes
+func (r *Resource) addLink(name string, link Link) {
+	if r.Links == nil {
+		r.Links = make(map[string]Link)
+	}
+	r.Links[name] = link
 }
