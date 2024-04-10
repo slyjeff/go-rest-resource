@@ -29,6 +29,7 @@ func newConfigureMap(r *Resource, copyPairs ...copyPair) ConfigureMap {
 	return ConfigureMap{r, copyPairs, make([]string, 0)}
 }
 
+//goland:noinspection GoMixedReceiverTypes
 func (r *Resource) MapChild(fieldName string, source interface{}) *ConfigureMap {
 	if r.Values == nil {
 		r.Values = make(MappedData)

@@ -17,7 +17,7 @@ func Test_LinkMustAddLinkToResource(t *testing.T) {
 	//assert
 	a := assert.New(t)
 	link, ok := resource.Links["getUser"]
-	a.True(ok, "'getUser' must exist")
+	a.True(ok)
 	a.Equal(link.Href, href)
 	a.Equal(link.Verb, "GET")
 }
@@ -27,10 +27,33 @@ func Test_LinkMustAddLinkToResourceWithVerb(t *testing.T) {
 	var resource Resource
 
 	//act
-	resource.Link("getUser", "/user", linkoption.Verb("POST"))
+	resource.Link("newUser", "/user", linkoption.Verb("POST"))
 
 	//assert
 	a := assert.New(t)
-	link, _ := resource.Links["getUser"]
+	link, _ := resource.Links["newUser"]
 	a.Equal(link.Verb, "POST")
+}
+
+func Test_LinkMustAddLinkToResourceWithParameters(t *testing.T) {
+	//arrange
+	var resource Resource
+
+	//act
+	resource.LinkWithParameters("searchUsers", "/user").
+		Parameter("lastName").
+		Parameter("firstName").
+		EndMap().
+		Link("newUser", "/user", linkoption.Verb("POST"))
+
+	//assert
+	a := assert.New(t)
+	link, _ := resource.Links["searchUsers"]
+	a.Equal(link.Href, "/user")
+	a.Equal(link.Verb, "GET")
+	a.Equal(link.Parameters[0].Name, "lastName")
+	a.Equal(link.Parameters[1].Name, "firstName")
+
+	_, ok := resource.Links["newUser"]
+	a.True(ok)
 }
