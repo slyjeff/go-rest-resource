@@ -20,6 +20,7 @@ func Test_LinkMustAddLinkToResource(t *testing.T) {
 	a.True(ok)
 	a.Equal(link.Href, href)
 	a.Equal(link.Verb, "GET")
+	a.False(link.IsTemplated)
 }
 
 func Test_LinkMustAddLinkToResourceWithVerb(t *testing.T) {
@@ -33,6 +34,19 @@ func Test_LinkMustAddLinkToResourceWithVerb(t *testing.T) {
 	a := assert.New(t)
 	link, _ := resource.Links["newUser"]
 	a.Equal(link.Verb, "POST")
+}
+
+func Test_LinkMustAddLinkWithTemplated(t *testing.T) {
+	//arrange
+	var resource Resource
+
+	//act
+	resource.Link("getUser", "/user/{id}", linkoption.Templated())
+
+	//assert
+	a := assert.New(t)
+	link, _ := resource.Links["getUser"]
+	a.True(link.IsTemplated)
 }
 
 func Test_LinkMustAddLinkToResourceWithParameters(t *testing.T) {

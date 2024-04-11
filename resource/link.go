@@ -6,11 +6,15 @@ import (
 
 //goland:noinspection GoMixedReceiverTypes
 func (r *Resource) Link(name string, href string, linkOptions ...linkoption.LinkOption) *Resource {
+	link := Link{Href: href, Verb: "GET", IsTemplated: false, Parameters: make([]LinkParameter, 0)}
+
 	if verb, ok := linkoption.FindVerbOption(linkOptions); ok {
-		r.addLink(name, Link{Href: href, Verb: verb, Parameters: make([]LinkParameter, 0)})
-	} else {
-		r.addLink(name, Link{Href: href, Verb: "GET", Parameters: make([]LinkParameter, 0)})
+		link.Verb = verb
 	}
+
+	link.IsTemplated = linkoption.FindTemplatedOption(linkOptions)
+
+	r.addLink(name, link)
 
 	return r
 }

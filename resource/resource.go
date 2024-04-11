@@ -6,9 +6,10 @@ type Resource struct {
 }
 
 type Link struct {
-	Href       string
-	Verb       string
-	Parameters []LinkParameter
+	Href        string
+	Verb        string
+	IsTemplated bool
+	Parameters  []LinkParameter
 }
 
 type LinkParameter struct {
