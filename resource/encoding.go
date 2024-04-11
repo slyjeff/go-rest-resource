@@ -19,10 +19,22 @@ func (l *Link) MarshalJSON() ([]byte, error) {
 	json := "{\"href\": \"" + l.Href + "\"}"
 
 	if l.Verb != "GET" {
-		json = json[:len(json)-1] + ",\"verb\": \"" + l.Verb + "\"}"
+		json = addToJson(json, "verb", quoted(l.Verb))
+	}
+
+	if l.IsTemplated {
+		json = addToJson(json, "templated", "true")
 	}
 
 	return []byte(json), nil
+}
+
+func quoted(s string) string {
+	return "\"" + s + "\""
+}
+
+func addToJson(json, name, value string) string {
+	return json[:len(json)-1] + ",\"" + name + "\":" + value + "}"
 }
 
 //goland:noinspection GoMixedReceiverTypes

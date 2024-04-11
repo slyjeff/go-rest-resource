@@ -121,7 +121,7 @@ func Test_MarshalJsonMustEncodeLinksAndData(t *testing.T) {
 	a.Equal(expectedJson, string(json))
 }
 
-func Test_MarshalJsonMustVerbIfNotGet(t *testing.T) {
+func Test_MarshalJsonMustOutputVerbIfNotGet(t *testing.T) {
 	//arrange
 	var r resource.Resource
 	r.Link("createUser", "/user", option.Verb("POST"))
@@ -133,5 +133,20 @@ func Test_MarshalJsonMustVerbIfNotGet(t *testing.T) {
 	a := assert.New(t)
 	a.NoError(err)
 	expectedJson := `{"_links":{"createUser":{"href":"/user","verb":"POST"}}}`
+	a.Equal(expectedJson, string(json))
+}
+
+func Test_MarshalJsonMustOutputTemplatedIfSet(t *testing.T) {
+	//arrange
+	var r resource.Resource
+	r.Link("createUser", "/user", option.Templated())
+
+	//act
+	json, err := MarshalJson(r)
+
+	//assert
+	a := assert.New(t)
+	a.NoError(err)
+	expectedJson := `{"_links":{"createUser":{"href":"/user","templated":true}}}`
 	a.Equal(expectedJson, string(json))
 }
