@@ -1,7 +1,7 @@
 package resource
 
 import (
-	"github.com/slyjeff/rest-resource/resource/linkoption"
+	"github.com/slyjeff/rest-resource/resource/option"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -28,7 +28,7 @@ func Test_LinkMustAddLinkToResourceWithVerb(t *testing.T) {
 	var resource Resource
 
 	//act
-	resource.Link("newUser", "/user", linkoption.Verb("POST"))
+	resource.Link("newUser", "/user", option.Verb("POST"))
 
 	//assert
 	a := assert.New(t)
@@ -41,7 +41,7 @@ func Test_LinkMustAddLinkWithTemplated(t *testing.T) {
 	var resource Resource
 
 	//act
-	resource.Link("getUser", "/user/{id}", linkoption.Templated())
+	resource.Link("getUser", "/user/{id}", option.Templated())
 
 	//assert
 	a := assert.New(t)
@@ -58,7 +58,7 @@ func Test_LinkMustAddLinkToResourceWithParameters(t *testing.T) {
 		Parameter("lastName").
 		Parameter("firstName").
 		EndMap().
-		Link("newUser", "/user", linkoption.Verb("POST"))
+		Link("newUser", "/user", option.Verb("POST"))
 
 	//assert
 	a := assert.New(t)
@@ -70,4 +70,21 @@ func Test_LinkMustAddLinkToResourceWithParameters(t *testing.T) {
 
 	_, ok := resource.Links["newUser"]
 	a.True(ok)
+}
+
+func Test_LinkMustAddParametersWithDefaultValues(t *testing.T) {
+	//arrange
+	var resource Resource
+
+	//act
+	resource.LinkWithParameters("searchUsers", "/user").
+		Parameter("lastName", option.Default("Smith")).
+		Parameter("firstName")
+
+	//assert
+	a := assert.New(t)
+	link, _ := resource.Links["searchUsers"]
+	a.Equal(link.Href, "/user")
+	a.Equal(link.Verb, "GET")
+	a.Equal(link.Parameters[0].DefaultValue, "Smith")
 }

@@ -13,7 +13,8 @@ type Link struct {
 }
 
 type LinkParameter struct {
-	Name string
+	Name         string
+	DefaultValue string
 }
 
 func NewResource() Resource {

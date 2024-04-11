@@ -2,7 +2,7 @@ package encoding
 
 import (
 	"github.com/slyjeff/rest-resource/resource"
-	"github.com/slyjeff/rest-resource/resource/mapping"
+	"github.com/slyjeff/rest-resource/resource/option"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -44,7 +44,7 @@ func Test_MarshalJsonMustEncodeFormattedData(t *testing.T) {
 
 	var r resource.Resource
 	r.MapDataFrom(i).
-		Map("Price", mapping.Format("%.02f"))
+		Map("Price", option.Format("%.02f"))
 
 	//act
 	json, err := MarshalJson(r)
@@ -125,7 +125,7 @@ func Test_MarshalXmlMustEncodeFormattedData(t *testing.T) {
 
 	var r resource.Resource
 	r.MapDataFrom(i).
-		Map("Price", mapping.Format("%.02f"))
+		Map("Price", option.Format("%.02f"))
 
 	//act
 	x, err := MarshalXml(r)

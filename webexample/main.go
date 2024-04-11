@@ -5,7 +5,7 @@ import (
 	"github.com/slyjeff/rest-resource/encoding"
 	"github.com/slyjeff/rest-resource/openapi"
 	"github.com/slyjeff/rest-resource/resource"
-	"github.com/slyjeff/rest-resource/resource/mapping"
+	"github.com/slyjeff/rest-resource/resource/option"
 	"net/http"
 )
 
@@ -55,7 +55,7 @@ func newUser(userName string, isAdmin bool, supervisor *user, directReports ...u
 func newUserResource(user user) resource.Resource {
 	userResource := resource.NewResource()
 	userResource.MapAllDataFrom(user)
-	userResource.Data("lastPaycheck", 30324.2534, mapping.Format("%.02f"))
+	userResource.Data("lastPaycheck", 30324.2534, option.Format("%.02f"))
 	return userResource
 }
 

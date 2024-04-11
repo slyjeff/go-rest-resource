@@ -1,7 +1,7 @@
 package resource
 
 import (
-	"github.com/slyjeff/rest-resource/resource/mapping"
+	"github.com/slyjeff/rest-resource/resource/option"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -42,7 +42,7 @@ func Test_FormattedDataAddValueAndFormattingInformation(t *testing.T) {
 	var resource Resource
 
 	//act
-	resource.Data("number", number, mapping.Format("%.02f"))
+	resource.Data("number", number, option.Format("%.02f"))
 
 	//assert
 	a := assert.New(t)

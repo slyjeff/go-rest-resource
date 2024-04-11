@@ -1,7 +1,7 @@
 package resource
 
 import (
-	"github.com/slyjeff/rest-resource/resource/mapping"
+	"github.com/slyjeff/rest-resource/resource/option"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -95,7 +95,7 @@ func Test_MapDataFromSupportFormattedData(t *testing.T) {
 
 	//act
 	resource.MapDataFrom(testStruct).
-		Map("FloatValue", mapping.Format("%.02f"))
+		Map("FloatValue", option.Format("%.02f"))
 
 	//assert
 	a := assert.New(t)
@@ -122,7 +122,7 @@ func Test_MapDataFromSupportRenaming(t *testing.T) {
 
 	//act
 	resource.MapDataFrom(testStruct).
-		Map("Value", mapping.Rename("coolValue"))
+		Map("Value", option.Rename("coolValue"))
 
 	//assert
 	a := assert.New(t)
@@ -205,7 +205,7 @@ func Test_MapAllMustNotOverwriteMapOptions(t *testing.T) {
 
 	//act
 	resource.MapDataFrom(testStruct).
-		Map("FloatValue", mapping.Format("%.02f")).
+		Map("FloatValue", option.Format("%.02f")).
 		MapAll()
 
 	//assert
@@ -395,7 +395,7 @@ func Test_MapFromChildMustAllowRenamingOfFieldsFromStruct(t *testing.T) {
 
 	//act
 	resource.MapChild("testStruct", testStruct).
-		Map("IntValue", mapping.Rename("age"))
+		Map("IntValue", option.Rename("age"))
 
 	//assert
 	a := assert.New(t)
@@ -420,7 +420,7 @@ func Test_MapFromChildMustAllowFormattingOfFieldsFromStruct(t *testing.T) {
 
 	//act
 	resource.MapChild("testStruct", testStruct).
-		Map("FloatValue", mapping.Format("%.02f"))
+		Map("FloatValue", option.Format("%.02f"))
 
 	//assert
 	a := assert.New(t)
@@ -485,7 +485,7 @@ func Test_MapFromChildMustNotOverwriteMapOptionsFromStruct(t *testing.T) {
 
 	//act
 	resource.MapChild("testStruct", testStruct).
-		Map("IntValue", mapping.Rename("age")).
+		Map("IntValue", option.Rename("age")).
 		MapAll()
 
 	//assert
@@ -604,7 +604,7 @@ func Test_MapFromChildMustAllowRenamingOfFieldsFromSlice(t *testing.T) {
 
 	//act
 	resource.MapChild("testSlice", testSlice).
-		Map("IntValue", mapping.Rename("age"))
+		Map("IntValue", option.Rename("age"))
 
 	//assert
 	a := assert.New(t)
@@ -634,7 +634,7 @@ func Test_MapFromChildMustAllowFormattingOfFieldsFromSlice(t *testing.T) {
 
 	//act
 	resource.MapChild("testSlice", testSlice).
-		Map("FloatValue", mapping.Format("%.02f"))
+		Map("FloatValue", option.Format("%.02f"))
 
 	//assert
 	a := assert.New(t)
@@ -725,7 +725,7 @@ func Test_MapFromChildMustNotOverwriteMapOptionsFromSlice(t *testing.T) {
 
 	//act
 	resource.MapChild("testSlice", testSlice).
-		Map("IntValue", mapping.Rename("age")).
+		Map("IntValue", option.Rename("age")).
 		MapAll()
 
 	//assert
@@ -852,7 +852,7 @@ func Test_MustBeAbleToRenameFieldsInChildStruct(t *testing.T) {
 	//act
 	resource.MapDataFrom(testStruct).
 		MapChild("ChildStruct").
-		Map("IntValue", mapping.Rename("age"))
+		Map("IntValue", option.Rename("age"))
 
 	//assert
 	a := assert.New(t)
@@ -952,7 +952,7 @@ func Test_MustBeAbleToRenameFieldsInChildSlice(t *testing.T) {
 	//act
 	resource.MapDataFrom(testStruct).
 		MapChild("Slice").
-		Map("IntValue", mapping.Rename("age"))
+		Map("IntValue", option.Rename("age"))
 
 	//assert
 	a := assert.New(t)

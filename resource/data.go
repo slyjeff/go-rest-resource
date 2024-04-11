@@ -1,13 +1,13 @@
 package resource
 
 import (
-	"github.com/slyjeff/rest-resource/resource/mapping"
+	"github.com/slyjeff/rest-resource/resource/option"
 	"reflect"
 )
 
 //goland:noinspection GoMixedReceiverTypes
-func (r *Resource) Data(name string, value interface{}, mapOptions ...mapping.MapOption) *Resource {
-	if format, ok := mapping.FindFormatOption(mapOptions); ok {
+func (r *Resource) Data(name string, value interface{}, mapOptions ...option.Option) *Resource {
+	if format, ok := option.FindFormatOption(mapOptions); ok {
 		r.addData(name, FormattedData{value, format})
 	} else {
 		r.addData(name, createResourceData(value))
