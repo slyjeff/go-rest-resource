@@ -19,7 +19,7 @@ func Test_LinkMustAddLinkToResource(t *testing.T) {
 	link, ok := resource.Links["getUser"]
 	a.True(ok)
 	a.Equal(link.Href, href)
-	a.Equal(link.Verb, "GET")
+	a.Equal("GET", link.Verb)
 	a.False(link.IsTemplated)
 }
 
@@ -33,7 +33,7 @@ func Test_LinkMustAddLinkToResourceWithVerb(t *testing.T) {
 	//assert
 	a := assert.New(t)
 	link, _ := resource.Links["newUser"]
-	a.Equal(link.Verb, "POST")
+	a.Equal("POST", link.Verb)
 }
 
 func Test_LinkMustAddLinkWithTemplated(t *testing.T) {
@@ -65,8 +65,8 @@ func Test_LinkMustAddLinkToResourceWithParameters(t *testing.T) {
 	link, _ := resource.Links["searchUsers"]
 	a.Equal(link.Href, "/user")
 	a.Equal(link.Verb, "GET")
-	a.Equal(link.Parameters[0].Name, "lastName")
-	a.Equal(link.Parameters[1].Name, "firstName")
+	a.Equal("lastName", link.Parameters[0].Name)
+	a.Equal("firstName", link.Parameters[1].Name)
 
 	_, ok := resource.Links["newUser"]
 	a.True(ok)
@@ -86,5 +86,23 @@ func Test_LinkMustAddParametersWithDefaultValues(t *testing.T) {
 	link, _ := resource.Links["searchUsers"]
 	a.Equal(link.Href, "/user")
 	a.Equal(link.Verb, "GET")
-	a.Equal(link.Parameters[0].DefaultValue, "Smith")
+	a.Equal("Smith", link.Parameters[0].DefaultValue)
+}
+
+func Test_LinkMustAddParametersWithListOfValues(t *testing.T) {
+	//arrange
+	var resource Resource
+	var values = []int{1, 2, 3}
+
+	//act
+	resource.LinkWithParameters("searchUsers", "/user").
+		Parameter("lastName", option.ListOfValues(values)).
+		Parameter("firstName")
+
+	//assert
+	a := assert.New(t)
+	link, _ := resource.Links["searchUsers"]
+	a.Equal(link.Href, "/user")
+	a.Equal(link.Verb, "GET")
+	a.Equal("1,2,3", link.Parameters[0].ListOfValues)
 }

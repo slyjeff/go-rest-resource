@@ -15,6 +15,7 @@ type Link struct {
 type LinkParameter struct {
 	Name         string
 	DefaultValue string
+	ListOfValues string
 }
 
 func NewResource() Resource {

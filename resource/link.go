@@ -32,10 +32,14 @@ type ConfigureLinkParameters struct {
 }
 
 func (clp ConfigureLinkParameters) Parameter(name string, parameterOptions ...option.Option) ConfigureLinkParameters {
-	parameter := LinkParameter{Name: name}
+	parameter := LinkParameter{Name: name, DefaultValue: "", ListOfValues: ""}
 
 	if defaultValue, ok := option.FindDefaultOption(parameterOptions); ok {
 		parameter.DefaultValue = defaultValue
+	}
+
+	if listOfValues, ok := option.FindListOfValuesOption(parameterOptions); ok {
+		parameter.ListOfValues = listOfValues
 	}
 
 	clp.link.Parameters = append(clp.link.Parameters, parameter)
