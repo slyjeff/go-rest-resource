@@ -7,7 +7,32 @@ import (
 )
 
 func MarshalJson(r resource.Resource) ([]byte, error) {
-	return json.Marshal(r.Values)
+	values, err := json.Marshal(r.Values)
+	if err != nil {
+		return nil, err
+	}
+
+	text := string(values)
+	if text == "null" {
+		text = "{}"
+	}
+
+	if len(r.Links) > 0 {
+		var links []byte
+		links, err = json.Marshal(r.Links)
+		if err != nil {
+			return nil, err
+		}
+
+		linksText := "\"_links\":" + string(links)
+		if text != "{}" {
+			linksText = "," + linksText
+		}
+
+		text = text[:len(text)-1] + linksText + "}"
+	}
+
+	return []byte(text), nil
 }
 
 func MarshalXml(r resource.Resource) ([]byte, error) {

@@ -15,6 +15,16 @@ func (fd FormattedData) MarshalJSON() ([]byte, error) {
 	return []byte(fd.FormattedString()), nil
 }
 
+func (l *Link) MarshalJSON() ([]byte, error) {
+	json := "{\"href\": \"" + l.Href + "\"}"
+
+	if l.Verb != "GET" {
+		json = json[:len(json)-1] + ",\"verb\": \"" + l.Verb + "\"}"
+	}
+
+	return []byte(json), nil
+}
+
 //goland:noinspection GoMixedReceiverTypes
 func (r Resource) MarshalXML(e *xml.Encoder, _ xml.StartElement) error {
 	tokens := make([]xml.Token, 0)

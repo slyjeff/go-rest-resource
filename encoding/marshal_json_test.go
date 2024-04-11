@@ -87,3 +87,51 @@ func Test_MarshalJsonMustEncodeChildSlice(t *testing.T) {
 	expectedJson := `{"Items":[{"IsAvailable":true,"Name":"widget","Price":45.2531,"Quantity":15},{"IsAvailable":false,"Name":"thingy","Price":13.84,"Quantity":7}],"Total":45.25}`
 	a.Equal(expectedJson, string(json))
 }
+
+func Test_MarshalJsonMustEncodeLinks(t *testing.T) {
+	//arrange
+	var r resource.Resource
+	r.Link("getUsers", "/user")
+	r.Link("getMessages", "/message")
+
+	//act
+	json, err := MarshalJson(r)
+
+	//assert
+	a := assert.New(t)
+	a.NoError(err)
+	expectedJson := `{"_links":{"getMessages":{"href":"/message"},"getUsers":{"href":"/user"}}}`
+	a.Equal(expectedJson, string(json))
+}
+
+func Test_MarshalJsonMustEncodeLinksAndData(t *testing.T) {
+	//arrange
+	var r resource.Resource
+	r.Data("message", "Hello World!")
+	r.Link("getUsers", "/user")
+	r.Link("getMessages", "/message")
+
+	//act
+	json, err := MarshalJson(r)
+
+	//assert
+	a := assert.New(t)
+	a.NoError(err)
+	expectedJson := `{"message":"Hello World!","_links":{"getMessages":{"href":"/message"},"getUsers":{"href":"/user"}}}`
+	a.Equal(expectedJson, string(json))
+}
+
+func Test_MarshalJsonMustVerbIfNotGet(t *testing.T) {
+	//arrange
+	var r resource.Resource
+	r.Link("createUser", "/user", option.Verb("POST"))
+
+	//act
+	json, err := MarshalJson(r)
+
+	//assert
+	a := assert.New(t)
+	a.NoError(err)
+	expectedJson := `{"_links":{"createUser":{"href":"/user","verb":"POST"}}}`
+	a.Equal(expectedJson, string(json))
+}

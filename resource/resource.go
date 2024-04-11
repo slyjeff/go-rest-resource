@@ -2,7 +2,7 @@ package resource
 
 type Resource struct {
 	Values MappedData
-	Links  map[string]*Link
+	Links  LinkData
 }
 
 type Link struct {
@@ -24,6 +24,8 @@ func NewResource() Resource {
 }
 
 type MappedData map[string]interface{}
+
+type LinkData map[string]*Link
 
 //goland:noinspection GoMixedReceiverTypes
 func (r *Resource) addData(fieldName string, value interface{}) {
