@@ -3,7 +3,7 @@ package encoding
 const resourceHtml = `<!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>UnknownResource</title>
+    <title>{{.Name}}</title>
 	<style>
 		body{
 		    margin: 0;
@@ -114,7 +114,7 @@ const resourceHtml = `<!DOCTYPE html>
 <body>
 	<div class="container">
 		<div class="header">
-			<h1 class="header-heading">UnknownResource</h1>
+			<h1 class="header-heading">{{.Name}}</h1>
 	    </div>
 		<div class="content">
 			<table>
@@ -124,7 +124,17 @@ const resourceHtml = `<!DOCTYPE html>
 				</tr>
 				{{end}}
 			</table>
-	    </div>
+			{{if .Links }}
+				<h3>Links</h3>
+				<table>
+					{{range $key, $value := .Links}}
+					<tr>
+						<td>{{$key}}</td><td><a href="{{$value.Href}}">{{$value.Href}}</a></td>
+					</tr>
+					{{end}}
+				</table>
+			{{end}}
+		</div>
     </div>
 </body>
 </HTML>`

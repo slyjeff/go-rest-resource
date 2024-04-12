@@ -1,6 +1,7 @@
 package resource
 
 type Resource struct {
+	Name   string
 	Values MappedData
 	Links  LinkData
 }
@@ -18,8 +19,13 @@ type LinkParameter struct {
 	ListOfValues string
 }
 
-func NewResource() Resource {
-	r := Resource{make(map[string]interface{}), make(map[string]*Link)}
+func NewResource(name ...string) Resource {
+	n := ""
+	if len(name) > 0 {
+		n = name[0]
+	}
+
+	r := Resource{n, make(map[string]interface{}), make(map[string]*Link)}
 	return r
 }
 

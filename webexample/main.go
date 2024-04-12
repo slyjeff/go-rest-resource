@@ -10,6 +10,8 @@ import (
 )
 
 func main() {
+	//userRepo := newUserRepo()
+
 	e := echo.New()
 	e.GET("/doc", func(c echo.Context) error {
 		info := openapi.Info{
@@ -24,38 +26,31 @@ func main() {
 	})
 
 	e.GET("/", func(c echo.Context) error {
-		alecia := newUser("ajones", true, nil)
-		susan := newUser("sanderson", false, nil)
-		mark := newUser("mwilliams", false, nil)
-		joe := newUser("jsmith", true, &alecia, susan, mark)
-
-		userResource := newUserResource(joe)
-
-		return respond(c, userResource)
+		return c.Redirect(301, "/application")
 	})
-	e.Logger.Fatal(e.Start(":80"))
-}
 
-type user struct {
-	Username      string
-	IsAdmin       bool
-	Supervisor    *user
-	DirectReports []user
-}
+	e.GET("/application", func(c echo.Context) error {
+		r := resource.NewResource("Application")
+		r.Link("getUsers", "/user")
+		return respond(c, r)
+	})
 
-func newUser(userName string, isAdmin bool, supervisor *user, directReports ...user) user {
-	return user{
-		userName,
-		isAdmin,
-		supervisor,
-		directReports,
-	}
+	e.GET("/user", func(c echo.Context) error {
+		r := resource.NewResource("Users")
+		r.Data("message", "Here be users")
+		r.LinkWithParameters("addUser", "/user", option.Verb("POST")).
+			Parameter("userName").
+			Parameter("email")
+
+		return respond(c, r)
+	})
+
+	e.Logger.Fatal(e.Start(":8090"))
 }
 
 func newUserResource(user user) resource.Resource {
-	userResource := resource.NewResource()
+	userResource := resource.NewResource("User")
 	userResource.MapAllDataFrom(user)
-	userResource.Data("lastPaycheck", 30324.2534, option.Format("%.02f"))
 	return userResource
 }
 
