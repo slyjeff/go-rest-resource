@@ -150,3 +150,53 @@ func Test_MarshalJsonMustOutputTemplatedIfSet(t *testing.T) {
 	expectedJson := `{"_links":{"createUser":{"href":"/user","templated":true}}}`
 	a.Equal(expectedJson, string(json))
 }
+
+func Test_MarshalJsonMustOutputLinkParameters(t *testing.T) {
+	//arrange
+	var r resource.Resource
+	r.LinkWithParameters("createUser", "/user").
+		Parameter("param1").
+		Parameter("param2")
+
+	//act
+	json, err := MarshalJson(r)
+
+	//assert
+	a := assert.New(t)
+	a.NoError(err)
+	expectedJson := `{"_links":{"createUser":{"href":"/user","parameters":{"param1":{},"param2":{}}}}}`
+	a.Equal(expectedJson, string(json))
+}
+
+func Test_MarshalJsonMustOutputLinkParameterDefaultValues(t *testing.T) {
+	//arrange
+	var r resource.Resource
+	r.LinkWithParameters("createUser", "/user").
+		Parameter("param1", option.Default("max"))
+
+	//act
+	json, err := MarshalJson(r)
+
+	//assert
+	a := assert.New(t)
+	a.NoError(err)
+	expectedJson := `{"_links":{"createUser":{"href":"/user","parameters":{"param1":{"default":"max"}}}}}`
+	a.Equal(expectedJson, string(json))
+}
+
+func Test_MarshalJsonMustOutputLinkParameterListOfValues(t *testing.T) {
+	//arrange
+	var r resource.Resource
+	listOfValues := []int{1, 2, 3}
+	r.LinkWithParameters("createUser", "/user").
+		Parameter("param1", option.ListOfValues(listOfValues))
+
+	//act
+	json, err := MarshalJson(r)
+
+	//assert
+	a := assert.New(t)
+	a.NoError(err)
+	expectedJson := `{"_links":{"createUser":{"href":"/user","parameters":{"param1":{"listOfValues":"1,2,3"}}}}}`
+	a.Equal(expectedJson, string(json))
+}

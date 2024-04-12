@@ -26,6 +26,24 @@ func (l *Link) MarshalJSON() ([]byte, error) {
 		json = addToJson(json, "templated", "true")
 	}
 
+	if len(l.Parameters) > 0 {
+		parametersJson := "{}"
+		for _, parameter := range l.Parameters {
+			parameterValues := "{}"
+
+			if parameter.DefaultValue != "" {
+				parameterValues = addToJson(parameterValues, "default", quoted(parameter.DefaultValue))
+			}
+
+			if parameter.ListOfValues != "" {
+				parameterValues = addToJson(parameterValues, "listOfValues", quoted(parameter.ListOfValues))
+			}
+
+			parametersJson = addToJson(parametersJson, parameter.Name, parameterValues)
+		}
+		json = addToJson(json, "parameters", parametersJson)
+	}
+
 	return []byte(json), nil
 }
 
@@ -34,7 +52,11 @@ func quoted(s string) string {
 }
 
 func addToJson(json, name, value string) string {
-	return json[:len(json)-1] + ",\"" + name + "\":" + value + "}"
+	nameValue := "\"" + name + "\":" + value
+	if json == "{}" {
+		return json[:len(json)-1] + nameValue + "}"
+	}
+	return json[:len(json)-1] + "," + nameValue + "}"
 }
 
 //goland:noinspection GoMixedReceiverTypes
