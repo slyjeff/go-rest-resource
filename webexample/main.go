@@ -9,8 +9,6 @@ import (
 )
 
 func main() {
-	userRepo := newUserRepo()
-
 	e := echo.New()
 	e.Pre(middleware.MethodOverrideWithConfig(middleware.MethodOverrideConfig{
 		Getter: middleware.MethodFromForm("_method"),
@@ -20,37 +18,7 @@ func main() {
 		return c.Redirect(301, "/application")
 	})
 
-	e.GET("/application", func(c echo.Context) error {
-		r := resource.NewResource("Application")
-		r.Link("/self", "/application")
-		r.LinkWithParameters("searchUsers", "/user").
-			Parameter("username")
-
-		return respond(c, r)
-	})
-
-	e.GET("/user", func(c echo.Context) error {
-		userSearch := userSearch{}
-		if err := c.Bind(&userSearch); err != nil {
-			return c.String(http.StatusInternalServerError, "")
-		}
-
-		users := userRepo.Search(userSearch.Username)
-
-		r := newUserListResource(users, userSearch.Criteria())
-
-		return respond(c, r)
-	})
-
-	e.POST("/user", func(c echo.Context) error {
-		user := user{}
-		if err := c.Bind(&user); err != nil {
-			return c.String(http.StatusInternalServerError, "")
-		}
-		r := newUserResource(user)
-
-		return respond(c, r)
-	})
+	registerUserHandlers(e)
 
 	e.Logger.Fatal(e.Start(":8090"))
 }

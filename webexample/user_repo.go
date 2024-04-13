@@ -6,7 +6,18 @@ type userRepo struct {
 	users []user
 }
 
-func (r userRepo) Search(username string) []user {
+func newUserRepo() userRepo {
+	userRepo := userRepo{[]user{
+		{1, "ajones", "ajones@aol.com"},
+		{2, "sanderson", "sanderson@gmail.com"},
+		{3, "mwilliams", "mwilliams@gmail.com"},
+		{4, "jsmith", "jsmith@outlook.com"},
+	}}
+
+	return userRepo
+}
+
+func (r *userRepo) Search(username string) []user {
 	users := make([]user, 0)
 	for _, u := range r.users {
 		if strings.Contains(u.Username, username) {
@@ -17,12 +28,45 @@ func (r userRepo) Search(username string) []user {
 	return users
 }
 
-func newUserRepo() userRepo {
-	users := []user{
-		newUser("ajones", "ajones@aol.com"),
-		newUser("sanderson", "sanderson@gmail.com"),
-		newUser("mwilliams", "mwilliams@gmail.com"),
-		newUser("jsmith", "jsmith@outlook.com"),
+func (r *userRepo) Add(u *user) {
+	u.id = r.GetUniqueId()
+	r.users = append(r.users, *u)
+}
+
+func (r *userRepo) GetUniqueId() int {
+	id := 1
+	for _, u := range r.users {
+		if u.id >= id {
+			id = u.id + 1
+		}
 	}
-	return userRepo{users}
+
+	return id
+}
+
+func (r *userRepo) GetById(id int) (*user, bool) {
+	for _, u := range r.users {
+		if u.id == id {
+			return &u, true
+		}
+	}
+
+	return nil, false
+}
+
+func (r *userRepo) Delete(id int) bool {
+	foundIndex := -1
+	for i, u := range r.users {
+		if u.id == id {
+			foundIndex = i
+			break
+		}
+	}
+
+	if foundIndex == -1 {
+		return false
+	}
+
+	r.users = append(r.users[:foundIndex], r.users[foundIndex+1:]...)
+	return true
 }

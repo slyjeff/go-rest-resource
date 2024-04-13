@@ -16,6 +16,7 @@ const resourceHtml = `{{define "resource"}}
 			<td>{{$embeddedName}}</td>
 			<td>
 			{{range $resource := $resources}}
+				<h2>{{$resource.Name}}</h2>
 				{{template "resource" $resource}}
 			{{end}}
 			</td>
@@ -81,7 +82,7 @@ const resourceHtml = `{{define "resource"}}
 		}
 
 		h1 { font-size: 2.25em; }
-		h2 { font-size: 1.375em; }
+		h2 { font-size: 1.375em; background: #555; color: white; padding: 0.25em}
 		h3 { font-size: 1.375em; background: lightgrey; padding: 0.25em }
 		
 		p {

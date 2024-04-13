@@ -1,10 +1,7 @@
 package main
 
 type user struct {
+	id       int
 	Username string `form:"username"`
 	Email    string `form:"email"`
-}
-
-func newUser(userName, email string) user {
-	return user{userName, email}
 }
