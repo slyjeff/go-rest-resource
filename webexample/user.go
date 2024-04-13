@@ -1,8 +1,8 @@
 package main
 
 type user struct {
-	Username string `form:"username"`
-	Email    string `form:"email"`
+	Username string `form:"username" query:"username"`
+	Email    string `form:"email" query:"email"`
 }
 
 func newUser(userName, email string) user {

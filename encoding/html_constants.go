@@ -130,12 +130,10 @@ const resourceHtml = `<!DOCTYPE html>
 					{{range $linkName, $link := .Links}}
 					<tr>
 						<td>{{$linkName}}</td>
-						{{if eq $link.Verb "GET"}}
-							<td><a href="{{$link.Href}}">{{$link.Href}}</a></td>
-						{{else}}
+						{{if or (ne $link.Verb "GET") $link.Parameters}}
 							<td>
-								<form action={{$link.Href}} method="POST">
-									{{if ne $link.Verb "POST"}}
+								<form action={{$link.Href}} {{if eq $link.Verb "GET"}} method="GET" {{else}} method="POST" {{end}}>
+									{{if and (ne $link.Verb "POST") (ne $link.Verb "POST")}}
 										<input type="hidden" name="_method" value="{{$link.Verb}}"></input>
 									{{end}}
 
@@ -157,6 +155,8 @@ const resourceHtml = `<!DOCTYPE html>
 									<input type="submit" class="btn" value="{{$link.Verb}}"></input>	
 								</form>
 						   </td>
+						{{else}}
+						  <td><a href="{{$link.Href}}">{{$link.Href}}</a></td>
 						{{end}}
 					</tr>
 					{{end}}

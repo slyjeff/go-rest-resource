@@ -4,7 +4,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/slyjeff/rest-resource/encoding"
-	"github.com/slyjeff/rest-resource/openapi"
 	"github.com/slyjeff/rest-resource/resource"
 	"github.com/slyjeff/rest-resource/resource/option"
 	"net/http"
@@ -18,40 +17,33 @@ func main() {
 		Getter: middleware.MethodFromForm("_method"),
 	}))
 
-	e.GET("/doc", func(c echo.Context) error {
-		info := openapi.Info{
-			Title:   "A Test API",
-			Version: "1.0.0",
-		}
-
-		userResource := newUserResource(user{})
-		value, contentType := openapi.MarshalDoc(c.Request().Header, info, userResource)
-		c.Response().Header().Set("Content-Type", contentType)
-		return c.String(http.StatusOK, value)
-	})
-
 	e.GET("/", func(c echo.Context) error {
 		return c.Redirect(301, "/application")
 	})
 
 	e.GET("/application", func(c echo.Context) error {
 		r := resource.NewResource("Application")
-		r.Link("getUsers", "/user")
+		r.LinkWithParameters("searchUsers", "/user").
+			Parameter("userName").
+			Parameter("email")
+
 		return respond(c, r)
 	})
 
 	e.GET("/user", func(c echo.Context) error {
-		r := resource.NewResource("Users")
-		r.Data("message", "Here be users")
-		r.LinkWithParameters("addUser", "/user", option.Verb("POST")).
+		user := user{}
+		if err := c.Bind(&user); err != nil {
+			return c.String(http.StatusInternalServerError, "")
+		}
+		r := newUserResource(user)
+		r.LinkWithParameters("addUser", "/user", option.Verb("PUT")).
 			Parameter("userName").
 			Parameter("Email")
 
 		return respond(c, r)
 	})
 
-	e.POST("/user", func(c echo.Context) error {
-		//user := newUser(c.FormValue("userName"), c.FormValue("Email"))
+	e.PUT("/user", func(c echo.Context) error {
 		user := user{}
 		if err := c.Bind(&user); err != nil {
 			return c.String(http.StatusInternalServerError, "")
