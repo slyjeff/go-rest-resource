@@ -133,7 +133,7 @@ const resourceHtml = `<!DOCTYPE html>
 						{{if or (ne $link.Verb "GET") $link.Parameters}}
 							<td>
 								<form action={{$link.Href}} {{if eq $link.Verb "GET"}} method="GET" {{else}} method="POST" {{end}}>
-									{{if and (ne $link.Verb "POST") (ne $link.Verb "POST")}}
+									{{if and (ne $link.Verb "GET") (ne $link.Verb "POST")}}
 										<input type="hidden" name="_method" value="{{$link.Verb}}"></input>
 									{{end}}
 
