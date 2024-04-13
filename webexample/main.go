@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/slyjeff/rest-resource/encoding"
 	"github.com/slyjeff/rest-resource/openapi"
 	"github.com/slyjeff/rest-resource/resource"
@@ -13,6 +14,10 @@ func main() {
 	//userRepo := newUserRepo()
 
 	e := echo.New()
+	e.Pre(middleware.MethodOverrideWithConfig(middleware.MethodOverrideConfig{
+		Getter: middleware.MethodFromForm("_method"),
+	}))
+
 	e.GET("/doc", func(c echo.Context) error {
 		info := openapi.Info{
 			Title:   "A Test API",
@@ -40,7 +45,18 @@ func main() {
 		r.Data("message", "Here be users")
 		r.LinkWithParameters("addUser", "/user", option.Verb("POST")).
 			Parameter("userName").
-			Parameter("email")
+			Parameter("Email")
+
+		return respond(c, r)
+	})
+
+	e.POST("/user", func(c echo.Context) error {
+		//user := newUser(c.FormValue("userName"), c.FormValue("Email"))
+		user := user{}
+		if err := c.Bind(&user); err != nil {
+			return c.String(http.StatusInternalServerError, "")
+		}
+		r := newUserResource(user)
 
 		return respond(c, r)
 	})

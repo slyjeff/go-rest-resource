@@ -118,18 +118,46 @@ const resourceHtml = `<!DOCTYPE html>
 	    </div>
 		<div class="content">
 			<table>
-				{{range $key, $value := .Values}}
+				{{range $dataKey, $dataValue := .Values}}
 				<tr>
-					<td>{{$key}}</td><td>{{FormatValue $value}}</td>
+					<td>{{$dataKey}}</td><td>{{FormatValue $dataValue}}</td>
 				</tr>
 				{{end}}
 			</table>
 			{{if .Links }}
 				<h3>Links</h3>
 				<table>
-					{{range $key, $value := .Links}}
+					{{range $linkName, $link := .Links}}
 					<tr>
-						<td>{{$key}}</td><td><a href="{{$value.Href}}">{{$value.Href}}</a></td>
+						<td>{{$linkName}}</td>
+						{{if eq $link.Verb "GET"}}
+							<td><a href="{{$link.Href}}">{{$link.Href}}</a></td>
+						{{else}}
+							<td>
+								<form action={{$link.Href}} method="POST">
+									{{if ne $link.Verb "POST"}}
+										<input type="hidden" name="_method" value="{{$link.Verb}}"></input>
+									{{end}}
+
+									{{range $parameterName, $parameter := $link.Parameters}}
+										{{ if $parameter.ListOfValues }}
+											<select name="{{$parameter.Name}}" placeholder="{{$parameter.Name}}" value="{{$parameter.DefaultValue}}">
+												{{ range $value := SeparateListOfValues $parameter.ListOfValues }}
+													<option value="$value" {{ if eq $value $parameter.DefaultValue }} selected="selected" {{ end }}>
+														{{ $value }}
+													</option>
+												{{ end }}
+											</select>
+										{{ else }}
+										    <input name="{{$parameter.Name}}" placeholder="{{$parameter.Name}}"	value="{{$parameter.DefaultValue}}"></input>
+										{{ end }}
+										<br>
+									{{end}}
+
+									<input type="submit" class="btn" value="{{$link.Verb}}"></input>	
+								</form>
+						   </td>
+						{{end}}
 					</tr>
 					{{end}}
 				</table>

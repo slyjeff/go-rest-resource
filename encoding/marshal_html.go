@@ -6,6 +6,7 @@ import (
 	"github.com/slyjeff/rest-resource/resource"
 	"html/template"
 	"reflect"
+	"strings"
 )
 
 func MarshalHtml(r resource.Resource) ([]byte, error) {
@@ -36,6 +37,9 @@ func MarshalHtml(r resource.Resource) ([]byte, error) {
 			}
 
 			return ""
+		},
+		"SeparateListOfValues": func(s string) []string {
+			return strings.Split(s, ",")
 		},
 	})
 
