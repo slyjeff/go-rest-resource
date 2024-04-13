@@ -5,12 +5,11 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/slyjeff/rest-resource/encoding"
 	"github.com/slyjeff/rest-resource/resource"
-	"github.com/slyjeff/rest-resource/resource/option"
 	"net/http"
 )
 
 func main() {
-	//userRepo := newUserRepo()
+	userRepo := newUserRepo()
 
 	e := echo.New()
 	e.Pre(middleware.MethodOverrideWithConfig(middleware.MethodOverrideConfig{
@@ -23,27 +22,27 @@ func main() {
 
 	e.GET("/application", func(c echo.Context) error {
 		r := resource.NewResource("Application")
+		r.Link("/self", "/application")
 		r.LinkWithParameters("searchUsers", "/user").
-			Parameter("userName").
-			Parameter("email")
+			Parameter("username")
 
 		return respond(c, r)
 	})
 
 	e.GET("/user", func(c echo.Context) error {
-		user := user{}
-		if err := c.Bind(&user); err != nil {
+		userSearch := userSearch{}
+		if err := c.Bind(&userSearch); err != nil {
 			return c.String(http.StatusInternalServerError, "")
 		}
-		r := newUserResource(user)
-		r.LinkWithParameters("addUser", "/user", option.Verb("PUT")).
-			Parameter("userName").
-			Parameter("Email")
+
+		users := userRepo.Search(userSearch.Username)
+
+		r := newUserListResource(users, userSearch.Criteria())
 
 		return respond(c, r)
 	})
 
-	e.PUT("/user", func(c echo.Context) error {
+	e.POST("/user", func(c echo.Context) error {
 		user := user{}
 		if err := c.Bind(&user); err != nil {
 			return c.String(http.StatusInternalServerError, "")
@@ -54,12 +53,6 @@ func main() {
 	})
 
 	e.Logger.Fatal(e.Start(":8090"))
-}
-
-func newUserResource(user user) resource.Resource {
-	userResource := resource.NewResource("User")
-	userResource.MapAllDataFrom(user)
-	return userResource
 }
 
 func respond(c echo.Context, r resource.Resource) error {

@@ -1,9 +1,10 @@
 package resource
 
 type Resource struct {
-	Name   string
-	Values MappedData
-	Links  LinkData
+	Name     string
+	Values   MappedData
+	Links    LinkData
+	Embedded EmbeddedResources
 }
 
 type Link struct {
@@ -25,13 +26,15 @@ func NewResource(name ...string) Resource {
 		n = name[0]
 	}
 
-	r := Resource{n, make(map[string]interface{}), make(map[string]*Link)}
+	r := Resource{n, make(map[string]interface{}), make(map[string]*Link), make(EmbeddedResources)}
 	return r
 }
 
 type MappedData map[string]interface{}
 
 type LinkData map[string]*Link
+
+type EmbeddedResources map[string][]Resource
 
 //goland:noinspection GoMixedReceiverTypes
 func (r *Resource) addData(fieldName string, value interface{}) {
@@ -47,4 +50,12 @@ func (r *Resource) addLink(name string, link Link) {
 		r.Links = make(map[string]*Link)
 	}
 	r.Links[name] = &link
+}
+
+//goland:noinspection GoMixedReceiverTypes
+func (r *Resource) addEmbeddedResources(name string, resources []Resource) {
+	if r.Embedded == nil {
+		r.Embedded = make(EmbeddedResources)
+	}
+	r.Embedded[name] = resources
 }

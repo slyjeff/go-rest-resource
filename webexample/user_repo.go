@@ -1,7 +1,20 @@
 package main
 
+import "strings"
+
 type userRepo struct {
 	users []user
+}
+
+func (r userRepo) Search(username string) []user {
+	users := make([]user, 0)
+	for _, u := range r.users {
+		if strings.Contains(u.Username, username) {
+			users = append(users, u)
+		}
+	}
+
+	return users
 }
 
 func newUserRepo() userRepo {

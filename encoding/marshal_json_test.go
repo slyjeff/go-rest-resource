@@ -200,3 +200,46 @@ func Test_MarshalJsonMustOutputLinkParameterListOfValues(t *testing.T) {
 	expectedJson := `{"_links":{"createUser":{"href":"/user","parameters":{"param1":{"listOfValues":"1,2,3"}}}}}`
 	a.Equal(expectedJson, string(json))
 }
+
+func Test_MarshalJsonMustOutputEmbeddedResource(t *testing.T) {
+	//arrange
+	var parent = resource.NewResource("parent")
+	parent.Data("id", 1)
+
+	var child = resource.NewResource("child")
+	child.Data("id", 2)
+
+	parent.Embed("child", child)
+
+	//act
+	json, err := MarshalJson(parent)
+
+	//assert
+	a := assert.New(t)
+	a.NoError(err)
+	expectedJson := `{"id":1,"_embedded":{"child":{"id":2}}}`
+	a.Equal(expectedJson, string(json))
+}
+
+func Test_MarshalJsonMustOutputEmbeddedResourceList(t *testing.T) {
+	//arrange
+	var parent = resource.NewResource("parent")
+	parent.Data("id", 1)
+
+	var child1 = resource.NewResource("child")
+	child1.Data("id", 2)
+
+	var child2 = resource.NewResource("child")
+	child2.Data("id", 3)
+
+	parent.Embed("children", child1, child2)
+
+	//act
+	json, err := MarshalJson(parent)
+
+	//assert
+	a := assert.New(t)
+	a.NoError(err)
+	expectedJson := `{"id":1,"_embedded":{"children":[{"id":2},{"id":3}]}}`
+	a.Equal(expectedJson, string(json))
+}
