@@ -1,6 +1,67 @@
 package encoding
 
-const resourceHtml = `<!DOCTYPE html>
+const resourceHtml = `{{define "resource"}}
+<table>
+	{{range $dataKey, $dataValue := .Values}}
+	<tr>
+		<td>{{$dataKey}}</td><td>{{FormatValue $dataValue}}</td>
+	</tr>
+	{{end}}
+</table>
+{{if .Embedded }}
+	<h3>Embedded</h3>
+	<table>
+		{{range $embeddedName, $resources := .Embedded}}
+		<tr>
+			<td>{{$embeddedName}}</td>
+			<td>
+			{{range $resource := $resources}}
+				{{template "resource" $resource}}
+			{{end}}
+			</td>
+		</tr>
+		{{end}}
+	</table>
+{{end}}
+{{if .Links }}
+	<h3>Links</h3>
+	<table>
+		{{range $linkName, $link := .Links}}
+		<tr>
+			<td>{{$linkName}}</td>
+			{{if or (ne $link.Verb "GET") $link.Parameters}}
+				<td>
+					<form action={{$link.Href}} {{if eq $link.Verb "GET"}} method="GET" {{else}} method="POST" {{end}}>
+						{{if and (ne $link.Verb "GET") (ne $link.Verb "POST")}}
+							<input type="hidden" name="_method" value="{{$link.Verb}}"></input>
+						{{end}}
+
+						{{range $parameterName, $parameter := $link.Parameters}}
+							{{ if $parameter.ListOfValues }}
+								<select name="{{$parameter.Name}}" placeholder="{{$parameter.Name}}" value="{{$parameter.DefaultValue}}">
+									{{ range $value := SeparateListOfValues $parameter.ListOfValues }}
+										<option value="$value" {{ if eq $value $parameter.DefaultValue }} selected="selected" {{ end }}>
+											{{ $value }}
+										</option>
+									{{ end }}
+								</select>
+							{{ else }}
+								<input name="{{$parameter.Name}}" placeholder="{{$parameter.Name}}"	value="{{$parameter.DefaultValue}}"></input>
+							{{ end }}
+							<br>
+						{{end}}
+
+						<input type="submit" class="btn" value="{{$link.Verb}}"></input>	
+					</form>
+			   </td>
+			{{else}}
+			  <td><a href="{{$link.Href}}">{{$link.Href}}</a></td>
+			{{end}}
+		</tr>
+		{{end}}
+	</table>
+{{end}}
+{{end}}<!DOCTYPE html>
 <html lang="en">
 <head>
     <title>{{.Name}}</title>
@@ -115,53 +176,9 @@ const resourceHtml = `<!DOCTYPE html>
 	<div class="container">
 		<div class="header">
 			<h1 class="header-heading">{{.Name}}</h1>
-	    </div>
+		</div>
 		<div class="content">
-			<table>
-				{{range $dataKey, $dataValue := .Values}}
-				<tr>
-					<td>{{$dataKey}}</td><td>{{FormatValue $dataValue}}</td>
-				</tr>
-				{{end}}
-			</table>
-			{{if .Links }}
-				<h3>Links</h3>
-				<table>
-					{{range $linkName, $link := .Links}}
-					<tr>
-						<td>{{$linkName}}</td>
-						{{if or (ne $link.Verb "GET") $link.Parameters}}
-							<td>
-								<form action={{$link.Href}} {{if eq $link.Verb "GET"}} method="GET" {{else}} method="POST" {{end}}>
-									{{if and (ne $link.Verb "GET") (ne $link.Verb "POST")}}
-										<input type="hidden" name="_method" value="{{$link.Verb}}"></input>
-									{{end}}
-
-									{{range $parameterName, $parameter := $link.Parameters}}
-										{{ if $parameter.ListOfValues }}
-											<select name="{{$parameter.Name}}" placeholder="{{$parameter.Name}}" value="{{$parameter.DefaultValue}}">
-												{{ range $value := SeparateListOfValues $parameter.ListOfValues }}
-													<option value="$value" {{ if eq $value $parameter.DefaultValue }} selected="selected" {{ end }}>
-														{{ $value }}
-													</option>
-												{{ end }}
-											</select>
-										{{ else }}
-										    <input name="{{$parameter.Name}}" placeholder="{{$parameter.Name}}"	value="{{$parameter.DefaultValue}}"></input>
-										{{ end }}
-										<br>
-									{{end}}
-
-									<input type="submit" class="btn" value="{{$link.Verb}}"></input>	
-								</form>
-						   </td>
-						{{else}}
-						  <td><a href="{{$link.Href}}">{{$link.Href}}</a></td>
-						{{end}}
-					</tr>
-					{{end}}
-				</table>
-			{{end}}
+		{{template "resource" .}}
 		</div>
     </div>
 </body>
