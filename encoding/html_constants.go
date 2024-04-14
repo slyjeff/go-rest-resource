@@ -181,7 +181,6 @@ const resourceHtml = `{{define "resource"}}
     <script>
 		function OnUpdateTemplatedUrl (linkId, originalHref, parameters) {
 			var href = originalHref;
-			console.log(parameters);	
 			for (x in parameters) {
 				parameterElement = document.getElementById(linkId + "_" + parameters[x]);
                 value = parameterElement.value;
@@ -190,7 +189,6 @@ const resourceHtml = `{{define "resource"}}
 				}
 				href = href.replace(parameters[x], parameterElement.value);
 			}
-			console.log(href)
 			linkElement = document.getElementById(linkId) 
 			linkElement.setAttribute('href', href)
 			linkElement.innerHTML = href
