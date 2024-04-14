@@ -18,6 +18,15 @@ func main() {
 		return c.Redirect(301, "/application")
 	})
 
+	e.GET("/application", func(c echo.Context) error {
+		r := resource.NewResource("Application")
+		r.Link("/self", "/application")
+		r.LinkWithParameters("searchUsers", "/user").
+			Parameter("username")
+
+		return respond(c, r)
+	})
+
 	registerUserHandlers(e)
 
 	e.Logger.Fatal(e.Start(":8090"))

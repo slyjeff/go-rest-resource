@@ -56,7 +56,13 @@ const resourceHtml = `{{define "resource"}}
 					</form>
 			   </td>
 			{{else}}
-			  <td><a href="{{$link.Href}}">{{$link.Href}}</a></td>
+			  <td>
+				<a id="{{$linkName}}" href="{{$link.Href}}">{{$link.Href}}</a>
+				{{ range $templatedParameter := GetTemplatedParameters $link }}
+					<br>
+                    <input id="{{$linkName}}_{{$templatedParameter}}" placeholder="{{$templatedParameter}}" oninput="OnUpdateTemplatedUrl({{$linkName}}, {{$link.Href}}, {{ GetTemplatedParameters $link }})"></input>
+                {{ end }}
+			  </td>
 			{{end}}
 		</tr>
 		{{end}}
@@ -172,6 +178,24 @@ const resourceHtml = `{{define "resource"}}
 			.content { padding: 2em 3em; }
 		}
 	</style>
+    <script>
+		function OnUpdateTemplatedUrl (linkId, originalHref, parameters) {
+			var href = originalHref;
+			console.log(parameters);	
+			for (x in parameters) {
+				parameterElement = document.getElementById(linkId + "_" + parameters[x]);
+                value = parameterElement.value;
+				if (value === '') {
+					continue; 
+				}
+				href = href.replace(parameters[x], parameterElement.value);
+			}
+			console.log(href)
+			linkElement = document.getElementById(linkId) 
+			linkElement.setAttribute('href', href)
+			linkElement.innerHTML = href
+		}
+	</script>
 </head>
 <body>
 	<div class="container">

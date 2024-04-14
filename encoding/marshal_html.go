@@ -6,6 +6,7 @@ import (
 	"github.com/slyjeff/rest-resource/resource"
 	"html/template"
 	"reflect"
+	"regexp"
 	"strings"
 )
 
@@ -48,6 +49,14 @@ func MarshalHtml(r resource.Resource) ([]byte, error) {
 				return embeddedResourceList
 			}
 			return make([]resource.Resource, 0)
+		},
+		"GetTemplatedParameters": func(link resource.Link) []string {
+			parameters := make([]string, 0)
+			if !link.IsTemplated {
+				return parameters
+			}
+			re := regexp.MustCompile("{[a-zA-Z0-9]*}")
+			return re.FindAllString(link.Href, -1)
 		},
 	})
 

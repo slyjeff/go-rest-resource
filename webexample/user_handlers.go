@@ -12,15 +12,6 @@ import (
 func registerUserHandlers(e *echo.Echo) {
 	userRepo := newUserRepo()
 
-	e.GET("/application", func(c echo.Context) error {
-		r := resource.NewResource("Application")
-		r.Link("/self", "/application")
-		r.LinkWithParameters("searchUsers", "/user").
-			Parameter("username")
-
-		return respond(c, r)
-	})
-
 	e.GET("/user", func(c echo.Context) error {
 		userSearch := userSearch{}
 		if err := c.Bind(&userSearch); err != nil {
