@@ -115,7 +115,7 @@ func newUserListResource(users []user, queryParams string) resource.Resource {
 		userResources[i] = newUserResource(user)
 	}
 
-	r.Embed("users", userResources...)
+	r.EmbedResources("users", userResources)
 	r.Link("_self", "/user"+queryParams)
 	r.LinkWithParameters("createUser", "/user", option.Verb("POST")).
 		Parameter("userName").

@@ -209,7 +209,7 @@ func Test_MarshalJsonMustOutputEmbeddedResource(t *testing.T) {
 	var child = resource.NewResource("child")
 	child.Data("id", 2)
 
-	parent.Embed("child", child)
+	parent.EmbedResource("child", child)
 
 	//act
 	json, err := MarshalJson(parent)
@@ -232,7 +232,7 @@ func Test_MarshalJsonMustOutputEmbeddedResourceList(t *testing.T) {
 	var child2 = resource.NewResource("child")
 	child2.Data("id", 3)
 
-	parent.Embed("children", child1, child2)
+	parent.EmbedResources("children", []resource.Resource{child1, child2})
 
 	//act
 	json, err := MarshalJson(parent)

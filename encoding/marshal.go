@@ -31,14 +31,14 @@ func MarshalJson(r resource.Resource) ([]byte, error) {
 	if len(r.Embedded) > 0 {
 		embeddedJson := "{}"
 		for name, embedded := range r.Embedded {
-			if len(embedded) == 1 {
-				if resourceJson, err := MarshalJson(embedded[0]); err == nil {
+			if embeddedResource, ok := embedded.(resource.Resource); ok {
+				if resourceJson, err := MarshalJson(embeddedResource); err == nil {
 					embeddedJson = addToJson(embeddedJson, name, string(resourceJson))
 				}
-			} else {
+			} else if embeddedResourceList, ok := embedded.([]resource.Resource); ok {
 				resourceJsonList := make([]string, 0)
-				for _, childResource := range embedded {
-					if resourceJson, err := MarshalJson(childResource); err == nil {
+				for _, embeddedResource := range embeddedResourceList {
+					if resourceJson, err := MarshalJson(embeddedResource); err == nil {
 						resourceJsonList = append(resourceJsonList, string(resourceJson))
 					}
 				}

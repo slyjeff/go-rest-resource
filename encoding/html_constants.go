@@ -15,7 +15,7 @@ const resourceHtml = `{{define "resource"}}
 		<tr>
 			<td>{{$embeddedName}}</td>
 			<td>
-			{{range $resource := $resources}}
+			{{range $resource := GetEmbeddedList $resources}}
 				<h2>{{$resource.Name}}</h2>
 				{{template "resource" $resource}}
 			{{end}}

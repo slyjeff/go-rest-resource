@@ -41,6 +41,14 @@ func MarshalHtml(r resource.Resource) ([]byte, error) {
 		"SeparateListOfValues": func(s string) []string {
 			return strings.Split(s, ",")
 		},
+		"GetEmbeddedList": func(i interface{}) []resource.Resource {
+			if embeddedResource, ok := i.(resource.Resource); ok {
+				return []resource.Resource{embeddedResource}
+			} else if embeddedResourceList, ok := i.([]resource.Resource); ok {
+				return embeddedResourceList
+			}
+			return make([]resource.Resource, 0)
+		},
 	})
 
 	var err error

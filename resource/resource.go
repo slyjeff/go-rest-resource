@@ -34,7 +34,7 @@ type MappedData map[string]interface{}
 
 type LinkData map[string]*Link
 
-type EmbeddedResources map[string][]Resource
+type EmbeddedResources map[string]interface{}
 
 //goland:noinspection GoMixedReceiverTypes
 func (r *Resource) addData(fieldName string, value interface{}) {
@@ -50,6 +50,14 @@ func (r *Resource) addLink(name string, link Link) {
 		r.Links = make(map[string]*Link)
 	}
 	r.Links[name] = &link
+}
+
+//goland:noinspection GoMixedReceiverTypes
+func (r *Resource) addEmbeddedResource(name string, resource Resource) {
+	if r.Embedded == nil {
+		r.Embedded = make(EmbeddedResources)
+	}
+	r.Embedded[name] = resource
 }
 
 //goland:noinspection GoMixedReceiverTypes

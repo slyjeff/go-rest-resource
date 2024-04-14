@@ -11,13 +11,13 @@ func Test_EmbedMustEmbedChildResourceInParent(t *testing.T) {
 	parent := NewResource("parent")
 
 	//act
-	parent.Embed("child", child)
+	parent.EmbedResource("child", child)
 
 	//assert
 	a := assert.New(t)
 	c, ok := parent.Embedded["child"]
 	a.True(ok)
-	a.Equal(child, c[0])
+	a.Equal(child, c)
 }
 
 func Test_EmbedMustEmbedListOfChildResourcesInParent(t *testing.T) {
@@ -28,7 +28,7 @@ func Test_EmbedMustEmbedListOfChildResourcesInParent(t *testing.T) {
 	parent := NewResource("parent")
 
 	//act
-	parent.Embed("children", children...)
+	parent.EmbedResources("children", children)
 
 	//assert
 	a := assert.New(t)
