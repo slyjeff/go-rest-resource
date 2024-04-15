@@ -1,8 +1,8 @@
 package encoding
 
 import (
-	"github.com/slyjeff/rest-resource/resource"
-	"github.com/slyjeff/rest-resource/resource/option"
+	"github.com/slyjeff/rest-resource"
+	"github.com/slyjeff/rest-resource/option"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

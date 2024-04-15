@@ -3,7 +3,7 @@ package encoding
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/slyjeff/rest-resource/resource"
+	"github.com/slyjeff/rest-resource"
 	"html/template"
 	"reflect"
 	"regexp"

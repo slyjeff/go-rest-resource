@@ -2,7 +2,7 @@ package openapi
 
 import (
 	"encoding/json"
-	"github.com/slyjeff/rest-resource/resource"
+	"github.com/slyjeff/rest-resource"
 )
 
 func MarshalJson(info Info, r ...resource.Resource) ([]byte, error) {

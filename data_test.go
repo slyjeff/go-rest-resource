@@ -1,7 +1,7 @@
 package resource
 
 import (
-	"github.com/slyjeff/rest-resource/resource/option"
+	"github.com/slyjeff/rest-resource/option"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

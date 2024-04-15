@@ -3,8 +3,8 @@ package main
 import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/slyjeff/rest-resource/resource"
-	"github.com/slyjeff/rest-resource/resource/encoding"
+	"github.com/slyjeff/rest-resource"
+	"github.com/slyjeff/rest-resource/encoding"
 	"net/http"
 )
 

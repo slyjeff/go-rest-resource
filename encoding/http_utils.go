@@ -2,7 +2,7 @@ package encoding
 
 import (
 	"encoding/xml"
-	"github.com/slyjeff/rest-resource/resource"
+	"github.com/slyjeff/rest-resource"
 	"strings"
 )
 

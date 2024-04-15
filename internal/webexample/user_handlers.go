@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/labstack/echo/v4"
-	"github.com/slyjeff/rest-resource/resource"
-	"github.com/slyjeff/rest-resource/resource/option"
+	"github.com/slyjeff/rest-resource"
+	"github.com/slyjeff/rest-resource/option"
 	"net/http"
 	"strconv"
 )
