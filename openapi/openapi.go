@@ -68,7 +68,8 @@ type openApi struct {
 func (openApi *openApi) addPath(link resource.Link, summary string) {
 	path, ok := openApi.Paths[link.Href]
 	if !ok {
-		openApi.Paths[link.Href] = make(Path)
+		path = make(Path)
+		openApi.Paths[link.Href] = path
 	}
 
 	parameters := getPathParameters(link.Href)
