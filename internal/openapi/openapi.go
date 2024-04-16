@@ -38,11 +38,20 @@ func newOpenApi(info Info, server string, resources []resource.Resource) openApi
 			continue
 		}
 
-		if _, ok := doc.Components.Schemas[r.Schema]; ok {
-			continue
+		if _, ok := doc.Components.Schemas[r.Schema]; !ok {
+			doc.Components.Schemas[r.Schema] = newSchemaFromResource(r)
 		}
 
-		doc.Components.Schemas[r.Schema] = newSchemaFromResource(r)
+		for _, link := range r.Links {
+			if link.Verb == "GET" || len(link.Parameters) == 0 || link.Schema == "" {
+				continue
+			}
+
+			bodySchema := link.Verb + link.Schema
+			if _, ok := doc.Components.Schemas[bodySchema]; !ok {
+				doc.Components.Schemas[bodySchema] = newSchemaFromParameters(link.Parameters)
+			}
+		}
 	}
 
 	return doc
@@ -71,7 +80,12 @@ func (openApi *openApi) addPath(link resource.Link, summary string) {
 	verb := strings.ToLower(link.Verb)
 	if _, ok := path[verb]; !ok {
 		queryParameters := getQueryParameters(link)
-		path[verb] = newOperation(link.ResponseCodes, formatSummary(summary), link.Schema, queryParameters)
+		bodySchema := ""
+		if link.Verb != "GET" && link.Schema != "" && len(link.Parameters) > 0 {
+			bodySchema = link.Verb + link.Schema
+		}
+
+		path[verb] = newOperation(link.ResponseCodes, formatSummary(summary), link.Schema, queryParameters, bodySchema)
 	}
 }
 
@@ -152,40 +166,50 @@ type Parameter struct {
 }
 
 type Operation struct {
-	Description string              `json:"summary,omitempty" yaml:"summary,omitempty"`
-	Responses   map[string]Response `json:"responses,omitempty" yaml:"responses,omitempty"`
-	Parameters  []Parameter         `json:"parameters,omitempty" yaml:"parameters,omitempty"`
+	Description     string                `json:"summary,omitempty" yaml:"summary,omitempty"`
+	Responses       map[string]DataObject `json:"responses,omitempty" yaml:"responses,omitempty"`
+	QueryParameters []Parameter           `json:"parameters,omitempty" yaml:"parameters,omitempty"`
+	RequestBody     *DataObject           `json:"requestBody,omitempty" yaml:"requestBody,omitempty"`
 }
 
-func newOperation(codes []int, description string, schema string, parameters []Parameter) Operation {
-	responses := make(map[string]Response)
+func newOperation(codes []int, description string, schema string, queryParameters []Parameter, bodySchema string) Operation {
+	responses := make(map[string]DataObject)
 	for _, code := range codes {
-		content := make(map[string]ResponseContent)
+		content := make(map[string]Content)
 		if code >= 200 && code <= 202 && schema != "" {
 			responseContent := newResponseContent(schema)
 			content["application/json"] = responseContent
 			content["application/xml"] = responseContent
 		}
-		responses[fmt.Sprintf("%v", code)] = Response{http.StatusText(code), content}
+		responses[fmt.Sprintf("%v", code)] = DataObject{http.StatusText(code), content}
 	}
 
-	return Operation{description, responses, parameters}
+	var requestBody *DataObject = nil
+	if bodySchema != "" {
+		requestBody = &DataObject{Content: make(map[string]Content)}
+		requestBodyContent := newResponseContent(bodySchema)
+		requestBody.Content["application/json"] = requestBodyContent
+		requestBody.Content["application/xml"] = requestBodyContent
+		requestBody.Content["application/x-www-form-urlencoded"] = requestBodyContent
+	}
+
+	return Operation{description, responses, queryParameters, requestBody}
 }
 
-type Response struct {
-	Description string                     `json:"description,omitempty" yaml:"description,omitempty"`
-	Content     map[string]ResponseContent `json:"content,omitempty" yaml:"content,omitempty"`
+type DataObject struct {
+	Description string             `json:"description,omitempty" yaml:"description,omitempty"`
+	Content     map[string]Content `json:"content,omitempty" yaml:"content,omitempty"`
 }
 
-type ResponseContent struct {
-	Schema ResponseSchema `json:"schema,omitempty" yaml:"schema,omitempty"`
+type Content struct {
+	Schema RefSchema `json:"schema,omitempty" yaml:"schema,omitempty"`
 }
 
-func newResponseContent(schema string) ResponseContent {
-	return ResponseContent{ResponseSchema{Ref: "#/components/schemas/" + schema}}
+func newResponseContent(schema string) Content {
+	return Content{RefSchema{Ref: "#/components/schemas/" + schema}}
 }
 
-type ResponseSchema struct {
+type RefSchema struct {
 	Ref string `json:"$ref,omitempty" yaml:"$ref,omitempty"`
 }
 
@@ -209,6 +233,16 @@ func newSchemaFromResource(r resource.Resource) Schema {
 
 	if len(r.Embedded) > 0 {
 		schema.Properties["_embedded"] = newSchemaFromEmbedded(r.Embedded)
+	}
+
+	return schema
+}
+
+func newSchemaFromParameters(parameters []resource.LinkParameter) Schema {
+	schema := Schema{"object", "", make(map[string]Schema), nil}
+
+	for _, parameter := range parameters {
+		schema.Properties[parameter.Name] = newSchemaFromDataType(parameter.DataType)
 	}
 
 	return schema
