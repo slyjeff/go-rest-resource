@@ -1,7 +1,8 @@
 package main
 
 type user struct {
-	id       int
+	Id       int
 	Username string `form:"username"`
 	Email    string `form:"email"`
+	IsActive bool   `form:"is_active"`
 }

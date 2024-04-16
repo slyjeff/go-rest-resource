@@ -5,20 +5,21 @@ import (
 	"strings"
 )
 
-func MarshalDoc(headers map[string][]string, info Info, resources ...resource.Resource) (string, string) {
+func MarshalDoc(headers map[string][]string, info Info, server string, resources ...resource.Resource) ([]byte, string) {
 	acceptFormats, _ := headers["Accept"]
 
 	if formatAccepted(acceptFormats, "application/json") {
-		if v, err := MarshalJson(info, resources...); err == nil {
-			return string(v), "application/json"
+		if v, err := MarshalJson(info, server, resources...); err == nil {
+			return v, "application/json"
 		}
-		return "", "application/json"
+		return nil, "application/json"
 	}
 
-	if v, err := MarshalYaml(info, resources...); err == nil {
-		return string(v), "text/yaml"
+	if v, err := MarshalYaml(info, server, resources...); err == nil {
+		return v, "text/yaml"
 	}
-	return "", "text/yaml"
+
+	return nil, "text/yaml"
 }
 
 func formatAccepted(acceptFormats []string, format string) bool {

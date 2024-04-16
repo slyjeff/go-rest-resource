@@ -1,6 +1,9 @@
 package main
 
-import "strings"
+import (
+	"strconv"
+	"strings"
+)
 
 type userRepo struct {
 	users []user
@@ -8,19 +11,19 @@ type userRepo struct {
 
 func newUserRepo() userRepo {
 	userRepo := userRepo{[]user{
-		{1, "ajones", "ajones@aol.com"},
-		{2, "sanderson", "sanderson@gmail.com"},
-		{3, "mwilliams", "mwilliams@gmail.com"},
-		{4, "jsmith", "jsmith@outlook.com"},
+		{1, "ajones", "ajones@aol.com", true},
+		{2, "sanderson", "sanderson@gmail.com", false},
+		{3, "mwilliams", "mwilliams@gmail.com", true},
+		{4, "jsmith", "jsmith@outlook.com", true},
 	}}
 
 	return userRepo
 }
 
-func (r *userRepo) Search(username string) []user {
+func (r *userRepo) Search(userSearch userSearch) []user {
 	users := make([]user, 0)
 	for _, u := range r.users {
-		if strings.Contains(u.Username, username) {
+		if canAdd(u, userSearch) {
 			users = append(users, u)
 		}
 	}
@@ -28,16 +31,32 @@ func (r *userRepo) Search(username string) []user {
 	return users
 }
 
+func canAdd(user user, userSearch userSearch) bool {
+	if userSearch.Username != "" && !strings.Contains(user.Username, userSearch.Username) {
+		return false
+	}
+
+	if userSearch.IsActive != "" {
+		isActive, err := strconv.ParseBool(userSearch.IsActive)
+		if err != nil {
+			return false
+		}
+		return user.IsActive == isActive
+	}
+
+	return true
+}
+
 func (r *userRepo) Add(u *user) {
-	u.id = r.GetUniqueId()
+	u.Id = r.GetUniqueId()
 	r.users = append(r.users, *u)
 }
 
 func (r *userRepo) GetUniqueId() int {
 	id := 1
 	for _, u := range r.users {
-		if u.id >= id {
-			id = u.id + 1
+		if u.Id >= id {
+			id = u.Id + 1
 		}
 	}
 
@@ -46,7 +65,7 @@ func (r *userRepo) GetUniqueId() int {
 
 func (r *userRepo) GetById(id int) (*user, bool) {
 	for _, u := range r.users {
-		if u.id == id {
+		if u.Id == id {
 			return &u, true
 		}
 	}
@@ -57,7 +76,7 @@ func (r *userRepo) GetById(id int) (*user, bool) {
 func (r *userRepo) Delete(id int) bool {
 	foundIndex := -1
 	for i, u := range r.users {
-		if u.id == id {
+		if u.Id == id {
 			foundIndex = i
 			break
 		}

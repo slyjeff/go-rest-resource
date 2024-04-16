@@ -39,6 +39,10 @@ func (l *Link) MarshalJSON() ([]byte, error) {
 				parameterValues = addToJson(parameterValues, "listOfValues", quoted(parameter.ListOfValues))
 			}
 
+			if parameter.DataType != "" {
+				parameterValues = addToJson(parameterValues, "dataType", quoted(parameter.DataType))
+			}
+
 			parametersJson = addToJson(parametersJson, parameter.Name, parameterValues)
 		}
 		json = addToJson(json, "parameters", parametersJson)

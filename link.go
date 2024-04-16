@@ -2,37 +2,49 @@ package resource
 
 import (
 	"github.com/slyjeff/rest-resource/option"
+	"net/http"
 )
 
 //goland:noinspection GoMixedReceiverTypes
-func (r *Resource) Link(name string, href string, linkOptions ...option.Option) *Resource {
-	link := Link{Href: href, Verb: "GET", IsTemplated: false, Parameters: make([]LinkParameter, 0)}
+func (r *Resource) Uri(href string) *Resource {
+	r.Link("self", href).
+		Schema(r.Schema)
+
+	return r
+}
+
+//goland:noinspection GoMixedReceiverTypes
+func (r *Resource) Link(name string, href string, linkOptions ...option.Option) ConfigureLink {
+	link := newLink(href)
 
 	if verb, ok := option.FindVerbOption(linkOptions); ok {
 		link.Verb = verb
+		switch link.Verb {
+		case "POST":
+			link.ResponseCodes = []int{http.StatusCreated, http.StatusBadRequest, http.StatusInternalServerError}
+		case "PUT":
+			link.ResponseCodes = []int{http.StatusOK, http.StatusBadRequest, http.StatusNotFound, http.StatusInternalServerError}
+		case "PATCH":
+			link.ResponseCodes = []int{http.StatusOK, http.StatusBadRequest, http.StatusNotFound, http.StatusInternalServerError}
+		case "DELETE":
+			link.ResponseCodes = []int{http.StatusOK, http.StatusNotFound, http.StatusInternalServerError}
+		}
 	}
 
 	link.IsTemplated = option.FindTemplatedOption(linkOptions)
 
 	r.addLink(name, link)
 
-	return r
+	return ConfigureLink{r, r.Links[name]}
 }
 
-//goland:noinspection GoMixedReceiverTypes
-func (r *Resource) LinkWithParameters(name string, href string, linkOptions ...option.Option) ConfigureLinkParameters {
-	r.Link(name, href, linkOptions...)
-
-	return ConfigureLinkParameters{r, r.Links[name]}
-}
-
-type ConfigureLinkParameters struct {
+type ConfigureLink struct {
 	resource *Resource
 	link     *Link
 }
 
-func (clp ConfigureLinkParameters) Parameter(name string, parameterOptions ...option.Option) ConfigureLinkParameters {
-	parameter := LinkParameter{Name: name, DefaultValue: "", ListOfValues: ""}
+func (cl ConfigureLink) Parameter(name string, parameterOptions ...option.Option) ConfigureLink {
+	parameter := newLinkParameter(name)
 
 	if defaultValue, ok := option.FindDefaultOption(parameterOptions); ok {
 		parameter.DefaultValue = defaultValue
@@ -42,11 +54,21 @@ func (clp ConfigureLinkParameters) Parameter(name string, parameterOptions ...op
 		parameter.ListOfValues = listOfValues
 	}
 
-	clp.link.Parameters = append(clp.link.Parameters, parameter)
+	if dataType, ok := option.FindDataType(parameterOptions); ok {
+		parameter.DataType = dataType
+	}
 
-	return clp
+	cl.link.Parameters = append(cl.link.Parameters, parameter)
+
+	return cl
 }
 
-func (clp ConfigureLinkParameters) EndMap() *Resource {
-	return clp.resource
+func (cl ConfigureLink) Schema(schema string) ConfigureLink {
+	cl.link.Schema = schema
+	return cl
+}
+
+func (cl ConfigureLink) ResponseCodes(statuses ...int) ConfigureLink {
+	cl.link.ResponseCodes = statuses
+	return cl
 }

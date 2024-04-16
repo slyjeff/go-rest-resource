@@ -18,17 +18,17 @@ func registerUserHandlers(e *echo.Echo) {
 			return c.String(http.StatusInternalServerError, "")
 		}
 
-		users := userRepo.Search(userSearch.Username)
+		users := userRepo.Search(userSearch)
 
 		r := newUserListResource(users, userSearch.Criteria())
 
-		return respond(c, r)
+		return respond(c, http.StatusOK, r)
 	})
 
-	e.GET("/user/:id", func(c echo.Context) error {
-		id, err := strconv.Atoi(c.Param("id"))
+	e.GET("/user/:Id", func(c echo.Context) error {
+		id, err := strconv.Atoi(c.Param("Id"))
 		if err != nil {
-			return c.String(http.StatusBadRequest, "Invalid id")
+			return c.String(http.StatusBadRequest, "Invalid Id")
 		}
 
 		u, ok := userRepo.GetById(id)
@@ -37,7 +37,7 @@ func registerUserHandlers(e *echo.Echo) {
 		}
 
 		r := newUserResource(*u)
-		return respond(c, r)
+		return respond(c, http.StatusOK, r)
 	})
 
 	e.POST("/user", func(c echo.Context) error {
@@ -49,13 +49,13 @@ func registerUserHandlers(e *echo.Echo) {
 
 		r := newUserResource(user)
 
-		return respond(c, r)
+		return respond(c, http.StatusCreated, r)
 	})
 
-	e.PUT("/user/:id", func(c echo.Context) error {
-		id, err := strconv.Atoi(c.Param("id"))
+	e.PUT("/user/:Id", func(c echo.Context) error {
+		id, err := strconv.Atoi(c.Param("Id"))
 		if err != nil {
-			return c.String(http.StatusBadRequest, "Invalid id")
+			return c.String(http.StatusBadRequest, "Invalid Id")
 		}
 
 		u, ok := userRepo.GetById(id)
@@ -69,13 +69,13 @@ func registerUserHandlers(e *echo.Echo) {
 
 		r := newUserResource(*u)
 
-		return respond(c, r)
+		return respond(c, http.StatusOK, r)
 	})
 
-	e.DELETE("/user/:id", func(c echo.Context) error {
-		id, err := strconv.Atoi(c.Param("id"))
+	e.DELETE("/user/:Id", func(c echo.Context) error {
+		id, err := strconv.Atoi(c.Param("Id"))
 		if err != nil {
-			return c.String(http.StatusBadRequest, "Invalid id")
+			return c.String(http.StatusBadRequest, "Invalid Id")
 		}
 
 		ok := userRepo.Delete(id)
@@ -89,17 +89,34 @@ func registerUserHandlers(e *echo.Echo) {
 
 type userSearch struct {
 	Username string `query:"username"`
+	IsActive string `query:"is_active"`
 }
 
 func (s userSearch) Criteria() string {
-	if s.Username == "" {
-		return ""
+	c := ""
+	c = addQueryParameter(c, "username", s.Username)
+	c = addQueryParameter(c, "is_active", s.IsActive)
+
+	return c
+}
+
+func addQueryParameter(s, name string, value string) string {
+	if name == "" || value == "" {
+		return s
 	}
-	return "?username=" + s.Username
+
+	if s == "" {
+		s += "?"
+	} else {
+		s += "&"
+	}
+	s += fmt.Sprintf("%s=%v", name, value)
+	return s
 }
 
 func newUserListResource(users []user, queryParams string) resource.Resource {
 	r := resource.NewResource("UserList")
+	r.Uri("/user" + queryParams)
 
 	userResources := make([]resource.Resource, len(users))
 	for i, user := range users {
@@ -107,22 +124,24 @@ func newUserListResource(users []user, queryParams string) resource.Resource {
 	}
 
 	r.EmbedResources("users", userResources)
-	r.Link("_self", "/user"+queryParams)
-	r.LinkWithParameters("createUser", "/user", option.Verb("POST")).
+	r.Link("createUser", "/user", option.Verb("POST")).
 		Parameter("userName").
-		Parameter("Email")
+		Parameter("Email").
+		Schema("User")
 
 	return r
 }
 
 func newUserResource(user user) resource.Resource {
-	url := fmt.Sprintf("/user/%d", user.id)
+	url := resource.ConstructUriFromTemplate("/user/{Id}", user.Id)
 	r := resource.NewResource("User")
+	r.Uri(url)
 	r.MapAllDataFrom(user)
-	r.Link("_self", url)
-	r.LinkWithParameters("update", url, option.Verb("PUT")).
+	r.Link("updateUser", url, option.Verb("PUT")).
 		Parameter("username", option.Default(user.Username)).
-		Parameter("email", option.Default(user.Email))
-	r.Link("delete", url, option.Verb("DELETE"))
+		Parameter("email", option.Default(user.Email)).
+		Schema("User")
+	r.Link("deleteUser", url, option.Verb("DELETE"))
+
 	return r
 }

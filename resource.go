@@ -1,33 +1,56 @@
 package resource
 
+import "net/http"
+
 type Resource struct {
-	Name     string
+	Schema   string
 	Values   MappedData
 	Links    LinkData
 	Embedded EmbeddedResources
 }
 
+func NewResource(schema ...string) Resource {
+	s := ""
+	if len(schema) > 0 {
+		s = schema[0]
+	}
+
+	r := Resource{
+		s,
+		make(map[string]interface{}),
+		make(map[string]*Link),
+		make(EmbeddedResources)}
+
+	return r
+}
+
 type Link struct {
-	Href        string
-	Verb        string
-	IsTemplated bool
-	Parameters  []LinkParameter
+	Href          string
+	Verb          string
+	IsTemplated   bool
+	Parameters    []LinkParameter
+	Schema        string
+	ResponseCodes []int
+}
+
+func newLink(href string) Link {
+	return Link{href, "GET", false, make([]LinkParameter, 0), "", []int{http.StatusOK, http.StatusNotFound, http.StatusInternalServerError}}
 }
 
 type LinkParameter struct {
 	Name         string
 	DefaultValue string
 	ListOfValues string
+	DataType     string
 }
 
-func NewResource(name ...string) Resource {
-	n := ""
-	if len(name) > 0 {
-		n = name[0]
-	}
+func newLinkParameter(name string) LinkParameter {
+	return LinkParameter{name, "", "", ""}
+}
 
-	r := Resource{n, make(map[string]interface{}), make(map[string]*Link), make(EmbeddedResources)}
-	return r
+type ResponseCode struct {
+	Status      int
+	Description string
 }
 
 type MappedData map[string]interface{}
