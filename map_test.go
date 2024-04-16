@@ -1,6 +1,8 @@
 package resource
 
 import (
+	"fmt"
+	"github.com/google/uuid"
 	"github.com/slyjeff/rest-resource/option"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -38,6 +40,35 @@ func Test_MapDataFromMustAddIndicatedProperties(t *testing.T) {
 
 	_, ok = resource.Values["BoolValue"]
 	a.False(ok, "'BoolValue' must not exist")
+}
+
+func Test_MapDataMustHandleUuid(t *testing.T) {
+	//arrange
+	id, _ := uuid.NewRandom()
+	testStruct := struct {
+		Id          uuid.UUID
+		FormattedId uuid.UUID
+	}{
+		Id:          id,
+		FormattedId: id,
+	}
+
+	var resource Resource
+
+	//act
+	resource.MapDataFrom(testStruct).
+		Map("Id").
+		Map("FormattedId", option.Format("%v"))
+
+	//assert
+	a := assert.New(t)
+	idValue, _ := resource.Values["Id"]
+	a.Equal(id, idValue)
+
+	formattedValue, _ := resource.Values["FormattedId"]
+	formatted, _ := formattedValue.(FormattedData)
+
+	a.Equal(fmt.Sprintf("%v", id), formatted.FormattedString())
 }
 
 func Test_MapDataFromMustAddFromMultipleStructs(t *testing.T) {

@@ -1,6 +1,7 @@
 package resource
 
 import (
+	"github.com/google/uuid"
 	"github.com/slyjeff/rest-resource/option"
 	"reflect"
 )
@@ -19,6 +20,10 @@ func (r *Resource) Data(name string, value interface{}, mapOptions ...option.Opt
 func createResourceData(value interface{}) interface{} {
 	if value == nil {
 		return ""
+	}
+
+	if u, ok := value.(uuid.UUID); ok {
+		return u
 	}
 
 	if reflect.TypeOf(value).Kind() == reflect.Pointer {
