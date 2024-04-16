@@ -60,22 +60,64 @@ func (openApi *openApi) addPath(link resource.Link, summary string) {
 	path, ok := openApi.Paths[link.Href]
 	if !ok {
 		path = make(Path)
-		re := regexp.MustCompile("{[a-zA-Z0-9]*}")
-		parameterNames := re.FindAllString(link.Href, -1)
-		if len(parameterNames) > 0 {
-			parameters := make([]Parameter, 0)
-			for _, parameter := range parameterNames {
-				parameter = parameter[1 : len(parameter)-1]
-				parameters = append(parameters, Parameter{parameter, "path", true, newIntParameterSchema()})
-			}
+		parameters := getPathParameters(link.Href)
+		if len(parameters) > 0 {
 			path["parameters"] = parameters
 		}
+
 		openApi.Paths[link.Href] = path
 	}
 
 	verb := strings.ToLower(link.Verb)
 	if _, ok := path[verb]; !ok {
-		path[verb] = newOperation(link.ResponseCodes, formatSummary(summary), link.Schema)
+		queryParameters := getQueryParameters(link)
+		path[verb] = newOperation(link.ResponseCodes, formatSummary(summary), link.Schema, queryParameters)
+	}
+}
+
+func getPathParameters(url string) []Parameter {
+	parameters := make([]Parameter, 0)
+
+	re := regexp.MustCompile("{[a-zA-Z0-9]*}")
+	parameterNames := re.FindAllString(url, -1)
+	if len(parameterNames) == 0 {
+		return parameters
+	}
+
+	for _, parameter := range parameterNames {
+		parameter = parameter[1 : len(parameter)-1]
+		parameters = append(parameters, Parameter{parameter, "path", true, newIntSchema()})
+	}
+
+	return parameters
+}
+
+func getQueryParameters(link resource.Link) []Parameter {
+	parameters := make([]Parameter, 0)
+
+	if link.Verb != "GET" {
+		return parameters
+	}
+
+	for _, parameter := range link.Parameters {
+		parameters = append(parameters, Parameter{parameter.Name, "query", false, newSchemaFromDataType(parameter.DataType)})
+	}
+
+	return parameters
+}
+
+func newSchemaFromDataType(dataType string) Schema {
+	switch strings.ToLower(dataType) {
+	case "int32":
+		return newInt32Schema()
+	case "int", "int64", "number":
+		return newIntSchema()
+	case "float", "float32", "float64":
+		return newFloatSchema()
+	case "bool", "boolean":
+		return newBoolSchema()
+	default:
+		return newStringSchema()
 	}
 }
 
@@ -103,27 +145,19 @@ type License struct {
 type Path map[string]interface{}
 
 type Parameter struct {
-	Name     string          `json:"name,omitempty" yaml:"name,omitempty"`
-	In       string          `json:"in,omitempty" yaml:"in,omitempty"`
-	Required bool            `json:"required" yaml:"required"`
-	Schema   ParameterSchema `json:"schema,omitempty" yaml:"schema,omitempty"`
-}
-
-type ParameterSchema struct {
-	Type   string `json:"type,omitempty" yaml:"type,omitempty"`
-	Format string `json:"format,omitempty" yaml:"format,omitempty"`
-}
-
-func newIntParameterSchema() ParameterSchema {
-	return ParameterSchema{"integer", "int64"}
+	Name     string `json:"name,omitempty" yaml:"name,omitempty"`
+	In       string `json:"in,omitempty" yaml:"in,omitempty"`
+	Required bool   `json:"required" yaml:"required"`
+	Schema   Schema `json:"schema,omitempty" yaml:"schema,omitempty"`
 }
 
 type Operation struct {
 	Description string              `json:"summary,omitempty" yaml:"summary,omitempty"`
 	Responses   map[string]Response `json:"responses,omitempty" yaml:"responses,omitempty"`
+	Parameters  []Parameter         `json:"parameters,omitempty" yaml:"parameters,omitempty"`
 }
 
-func newOperation(codes []int, description string, schema string) Operation {
+func newOperation(codes []int, description string, schema string, parameters []Parameter) Operation {
 	responses := make(map[string]Response)
 	for _, code := range codes {
 		content := make(map[string]ResponseContent)
@@ -135,7 +169,7 @@ func newOperation(codes []int, description string, schema string) Operation {
 		responses[fmt.Sprintf("%v", code)] = Response{http.StatusText(code), content}
 	}
 
-	return Operation{description, responses}
+	return Operation{description, responses, parameters}
 }
 
 type Response struct {
@@ -187,14 +221,34 @@ func newSchemaFromValue(value interface{}) Schema {
 
 	switch value.(type) {
 	case int:
-		return Schema{"integer", "int65", make(map[string]Schema), nil}
+		return newIntSchema()
 	case float64:
-		return Schema{"number", "float", make(map[string]Schema), nil}
+		return newFloatSchema()
 	case bool:
-		return Schema{"boolean", "", make(map[string]Schema), nil}
+		return newBoolSchema()
 	default:
-		return Schema{"string", "", make(map[string]Schema), nil}
+		return newStringSchema()
 	}
+}
+
+func newInt32Schema() Schema {
+	return Schema{"integer", "int32", make(map[string]Schema), nil}
+}
+
+func newIntSchema() Schema {
+	return Schema{"integer", "int64", make(map[string]Schema), nil}
+}
+
+func newFloatSchema() Schema {
+	return Schema{"number", "float", make(map[string]Schema), nil}
+}
+
+func newBoolSchema() Schema {
+	return Schema{"boolean", "", make(map[string]Schema), nil}
+}
+
+func newStringSchema() Schema {
+	return Schema{"string", "", make(map[string]Schema), nil}
 }
 
 func newSchemaFromEmbedded(embeddedResources resource.EmbeddedResources) Schema {
