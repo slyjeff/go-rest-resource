@@ -24,10 +24,10 @@ func registerUserHandlers(e *echo.Echo) {
 		return respond(c, r)
 	})
 
-	e.GET("/user/:id", func(c echo.Context) error {
-		id, err := strconv.Atoi(c.Param("id"))
+	e.GET("/user/:Id", func(c echo.Context) error {
+		id, err := strconv.Atoi(c.Param("Id"))
 		if err != nil {
-			return c.String(http.StatusBadRequest, "Invalid id")
+			return c.String(http.StatusBadRequest, "Invalid Id")
 		}
 
 		u, ok := userRepo.GetById(id)
@@ -51,10 +51,10 @@ func registerUserHandlers(e *echo.Echo) {
 		return respond(c, r)
 	})
 
-	e.PUT("/user/:id", func(c echo.Context) error {
-		id, err := strconv.Atoi(c.Param("id"))
+	e.PUT("/user/:Id", func(c echo.Context) error {
+		id, err := strconv.Atoi(c.Param("Id"))
 		if err != nil {
-			return c.String(http.StatusBadRequest, "Invalid id")
+			return c.String(http.StatusBadRequest, "Invalid Id")
 		}
 
 		u, ok := userRepo.GetById(id)
@@ -71,10 +71,10 @@ func registerUserHandlers(e *echo.Echo) {
 		return respond(c, r)
 	})
 
-	e.DELETE("/user/:id", func(c echo.Context) error {
-		id, err := strconv.Atoi(c.Param("id"))
+	e.DELETE("/user/:Id", func(c echo.Context) error {
+		id, err := strconv.Atoi(c.Param("Id"))
 		if err != nil {
-			return c.String(http.StatusBadRequest, "Invalid id")
+			return c.String(http.StatusBadRequest, "Invalid Id")
 		}
 
 		ok := userRepo.Delete(id)
@@ -107,21 +107,28 @@ func newUserListResource(users []user, queryParams string) resource.Resource {
 	}
 
 	r.EmbedResources("users", userResources)
-	r.LinkWithParameters("createUser", "/user", option.Verb("POST")).
+	r.Link("createUser", "/user", option.Verb("POST")).
 		Parameter("userName").
-		Parameter("Email")
+		Parameter("Email").
+		Schema("User").
+		ResponseCodes(http.StatusCreated, http.StatusInternalServerError)
 
 	return r
 }
 
 func newUserResource(user user) resource.Resource {
-	url := resource.ConstructUriFromTemplate("/user/{id}", user.id)
+	url := resource.ConstructUriFromTemplate("/user/{Id}", user.Id)
 	r := resource.NewResource("User")
 	r.Uri(url)
 	r.MapAllDataFrom(user)
-	r.LinkWithParameters("updateUser", url, option.Verb("PUT")).
+	r.Link("updateUser", url, option.Verb("PUT")).
 		Parameter("username", option.Default(user.Username)).
-		Parameter("email", option.Default(user.Email))
-	r.Link("deleteUser", url, option.Verb("DELETE"))
+		Parameter("email", option.Default(user.Email)).
+		Schema("User").
+		ResponseCodes(http.StatusOK, http.StatusNotFound, http.StatusInternalServerError)
+
+	r.Link("deleteUser", url, option.Verb("DELETE")).
+		ResponseCodes(http.StatusOK, http.StatusNotFound, http.StatusInternalServerError)
+
 	return r
 }

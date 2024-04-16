@@ -2,11 +2,21 @@ package resource
 
 import (
 	"github.com/slyjeff/rest-resource/option"
+	"net/http"
 )
 
 //goland:noinspection GoMixedReceiverTypes
-func (r *Resource) Link(name string, href string, linkOptions ...option.Option) *Resource {
-	link := Link{Href: href, Verb: "GET", IsTemplated: false, Parameters: make([]LinkParameter, 0)}
+func (r *Resource) Uri(href string) *Resource {
+	r.Link("self", href).
+		Schema(r.Name).
+		ResponseCodes(http.StatusOK, http.StatusNotFound, http.StatusInternalServerError)
+
+	return r
+}
+
+//goland:noinspection GoMixedReceiverTypes
+func (r *Resource) Link(name string, href string, linkOptions ...option.Option) ConfigureLink {
+	link := newLink(href)
 
 	if verb, ok := option.FindVerbOption(linkOptions); ok {
 		link.Verb = verb
@@ -16,28 +26,15 @@ func (r *Resource) Link(name string, href string, linkOptions ...option.Option) 
 
 	r.addLink(name, link)
 
-	return r
+	return ConfigureLink{r, r.Links[name]}
 }
 
-//goland:noinspection GoMixedReceiverTypes
-func (r *Resource) Uri(href string) *Resource {
-	r.Link("self", href)
-	return r
-}
-
-//goland:noinspection GoMixedReceiverTypes
-func (r *Resource) LinkWithParameters(name string, href string, linkOptions ...option.Option) ConfigureLinkParameters {
-	r.Link(name, href, linkOptions...)
-
-	return ConfigureLinkParameters{r, r.Links[name]}
-}
-
-type ConfigureLinkParameters struct {
+type ConfigureLink struct {
 	resource *Resource
 	link     *Link
 }
 
-func (clp ConfigureLinkParameters) Parameter(name string, parameterOptions ...option.Option) ConfigureLinkParameters {
+func (cl ConfigureLink) Parameter(name string, parameterOptions ...option.Option) ConfigureLink {
 	parameter := LinkParameter{Name: name, DefaultValue: "", ListOfValues: ""}
 
 	if defaultValue, ok := option.FindDefaultOption(parameterOptions); ok {
@@ -48,11 +45,17 @@ func (clp ConfigureLinkParameters) Parameter(name string, parameterOptions ...op
 		parameter.ListOfValues = listOfValues
 	}
 
-	clp.link.Parameters = append(clp.link.Parameters, parameter)
+	cl.link.Parameters = append(cl.link.Parameters, parameter)
 
-	return clp
+	return cl
 }
 
-func (clp ConfigureLinkParameters) EndMap() *Resource {
-	return clp.resource
+func (cl ConfigureLink) Schema(schema string) ConfigureLink {
+	cl.link.Schema = schema
+	return cl
+}
+
+func (cl ConfigureLink) ResponseCodes(statuses ...int) ConfigureLink {
+	cl.link.ResponseCodes = statuses
+	return cl
 }

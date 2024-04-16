@@ -7,11 +7,32 @@ type Resource struct {
 	Embedded EmbeddedResources
 }
 
+func NewResource(name ...string) Resource {
+	n := ""
+	if len(name) > 0 {
+		n = name[0]
+	}
+
+	r := Resource{
+		n,
+		make(map[string]interface{}),
+		make(map[string]*Link),
+		make(EmbeddedResources)}
+
+	return r
+}
+
 type Link struct {
-	Href        string
-	Verb        string
-	IsTemplated bool
-	Parameters  []LinkParameter
+	Href          string
+	Verb          string
+	IsTemplated   bool
+	Parameters    []LinkParameter
+	Schema        string
+	ResponseCodes []int
+}
+
+func newLink(href string) Link {
+	return Link{href, "GET", false, make([]LinkParameter, 0), "", make([]int, 0)}
 }
 
 type LinkParameter struct {
@@ -20,14 +41,14 @@ type LinkParameter struct {
 	ListOfValues string
 }
 
-func NewResource(name ...string) Resource {
-	n := ""
-	if len(name) > 0 {
-		n = name[0]
-	}
+type ResponseCode struct {
+	Status      int
+	Description string
+	Schema      string
+}
 
-	r := Resource{n, make(map[string]interface{}), make(map[string]*Link), make(EmbeddedResources)}
-	return r
+func newResponseCode(status int, description string, schema string) ResponseCode {
+	return ResponseCode{status, description, schema}
 }
 
 type MappedData map[string]interface{}

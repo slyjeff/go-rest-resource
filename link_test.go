@@ -3,6 +3,7 @@ package resource
 import (
 	"github.com/slyjeff/rest-resource/option"
 	"github.com/stretchr/testify/assert"
+	"net/http"
 	"testing"
 )
 
@@ -67,24 +68,23 @@ func Test_LinkMustAddLinkWithTemplated(t *testing.T) {
 
 func Test_LinkMustAddLinkToResourceWithParameters(t *testing.T) {
 	//arrange
-	var resource Resource
+	r := NewResource()
 
 	//act
-	resource.LinkWithParameters("searchUsers", "/user").
+	r.Link("searchUsers", "/user").
 		Parameter("lastName").
-		Parameter("firstName").
-		EndMap().
-		Link("newUser", "/user", option.Verb("POST"))
+		Parameter("firstName")
+	r.Link("newUser", "/user", option.Verb("POST"))
 
 	//assert
 	a := assert.New(t)
-	link, _ := resource.Links["searchUsers"]
+	link, _ := r.Links["searchUsers"]
 	a.Equal(link.Href, "/user")
 	a.Equal(link.Verb, "GET")
 	a.Equal("lastName", link.Parameters[0].Name)
 	a.Equal("firstName", link.Parameters[1].Name)
 
-	_, ok := resource.Links["newUser"]
+	_, ok := r.Links["newUser"]
 	a.True(ok)
 }
 
@@ -93,7 +93,7 @@ func Test_LinkMustAddParametersWithDefaultValues(t *testing.T) {
 	var resource Resource
 
 	//act
-	resource.LinkWithParameters("searchUsers", "/user").
+	resource.Link("searchUsers", "/user").
 		Parameter("lastName", option.Default("Smith")).
 		Parameter("firstName")
 
@@ -111,7 +111,7 @@ func Test_LinkMustAddParametersWithListOfValues(t *testing.T) {
 	var values = []int{1, 2, 3}
 
 	//act
-	resource.LinkWithParameters("searchUsers", "/user").
+	resource.Link("searchUsers", "/user").
 		Parameter("lastName", option.ListOfValues(values)).
 		Parameter("firstName")
 
@@ -121,4 +121,35 @@ func Test_LinkMustAddParametersWithListOfValues(t *testing.T) {
 	a.Equal(link.Href, "/user")
 	a.Equal(link.Verb, "GET")
 	a.Equal("1,2,3", link.Parameters[0].ListOfValues)
+}
+
+func Test_LinkMustSetSchema(t *testing.T) {
+	//arrange
+	r := NewResource("User")
+
+	//act
+	r.Link("searchUsers", "/user").
+		Schema("UserList")
+
+	//assert
+	a := assert.New(t)
+	link, _ := r.Links["searchUsers"]
+
+	a.Equal("UserList", link.Schema)
+}
+
+func Test_LinkMustSetResponseCodes(t *testing.T) {
+	//arrange
+	r := NewResource("User")
+
+	//act
+	r.Link("searchUsers", "/user").
+		ResponseCodes(http.StatusOK, http.StatusInternalServerError)
+
+	//assert
+	a := assert.New(t)
+	link, _ := r.Links["searchUsers"]
+
+	a.Equal(http.StatusOK, link.ResponseCodes[0])
+	a.Equal(http.StatusInternalServerError, link.ResponseCodes[1])
 }

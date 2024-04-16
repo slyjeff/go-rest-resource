@@ -154,7 +154,7 @@ func Test_MarshalJsonMustOutputTemplatedIfSet(t *testing.T) {
 func Test_MarshalJsonMustOutputLinkParameters(t *testing.T) {
 	//arrange
 	var r resource.Resource
-	r.LinkWithParameters("createUser", "/user").
+	r.Link("createUser", "/user").
 		Parameter("param1").
 		Parameter("param2")
 
@@ -171,7 +171,7 @@ func Test_MarshalJsonMustOutputLinkParameters(t *testing.T) {
 func Test_MarshalJsonMustOutputLinkParameterDefaultValues(t *testing.T) {
 	//arrange
 	var r resource.Resource
-	r.LinkWithParameters("createUser", "/user").
+	r.Link("createUser", "/user").
 		Parameter("param1", option.Default("max"))
 
 	//act
@@ -188,7 +188,7 @@ func Test_MarshalJsonMustOutputLinkParameterListOfValues(t *testing.T) {
 	//arrange
 	var r resource.Resource
 	listOfValues := []int{1, 2, 3}
-	r.LinkWithParameters("createUser", "/user").
+	r.Link("createUser", "/user").
 		Parameter("param1", option.ListOfValues(listOfValues))
 
 	//act

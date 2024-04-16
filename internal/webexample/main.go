@@ -34,8 +34,10 @@ func main() {
 func newApplicationResource() resource.Resource {
 	r := resource.NewResource("Application")
 	r.Uri("/application")
-	r.LinkWithParameters("searchUsers", "/user").
-		Parameter("username")
+	r.Link("searchUsers", "/user").
+		Parameter("username").
+		Schema("UserList").
+		ResponseCodes(http.StatusOK, http.StatusInternalServerError)
 
 	return r
 }
