@@ -1,5 +1,7 @@
 package resource
 
+import "net/http"
+
 type Resource struct {
 	Schema   string
 	Values   MappedData
@@ -32,19 +34,23 @@ type Link struct {
 }
 
 func newLink(href string) Link {
-	return Link{href, "GET", false, make([]LinkParameter, 0), "", make([]int, 0)}
+	return Link{href, "GET", false, make([]LinkParameter, 0), "", []int{http.StatusOK, http.StatusNotFound, http.StatusInternalServerError}}
 }
 
 type LinkParameter struct {
 	Name         string
 	DefaultValue string
 	ListOfValues string
+	DataType     string
+}
+
+func newLinkParameter(name string) LinkParameter {
+	return LinkParameter{name, "", "", ""}
 }
 
 type ResponseCode struct {
 	Status      int
 	Description string
-	Schema      string
 }
 
 type MappedData map[string]interface{}

@@ -8,8 +8,7 @@ import (
 //goland:noinspection GoMixedReceiverTypes
 func (r *Resource) Uri(href string) *Resource {
 	r.Link("self", href).
-		Schema(r.Schema).
-		ResponseCodes(http.StatusOK, http.StatusNotFound, http.StatusInternalServerError)
+		Schema(r.Schema)
 
 	return r
 }
@@ -20,6 +19,16 @@ func (r *Resource) Link(name string, href string, linkOptions ...option.Option) 
 
 	if verb, ok := option.FindVerbOption(linkOptions); ok {
 		link.Verb = verb
+		switch link.Verb {
+		case "POST":
+			link.ResponseCodes = []int{http.StatusCreated, http.StatusBadRequest, http.StatusInternalServerError}
+		case "PUT":
+			link.ResponseCodes = []int{http.StatusOK, http.StatusBadRequest, http.StatusNotFound, http.StatusInternalServerError}
+		case "PATCH":
+			link.ResponseCodes = []int{http.StatusOK, http.StatusBadRequest, http.StatusNotFound, http.StatusInternalServerError}
+		case "DELETE":
+			link.ResponseCodes = []int{http.StatusOK, http.StatusNotFound, http.StatusInternalServerError}
+		}
 	}
 
 	link.IsTemplated = option.FindTemplatedOption(linkOptions)
@@ -35,7 +44,7 @@ type ConfigureLink struct {
 }
 
 func (cl ConfigureLink) Parameter(name string, parameterOptions ...option.Option) ConfigureLink {
-	parameter := LinkParameter{Name: name, DefaultValue: "", ListOfValues: ""}
+	parameter := newLinkParameter(name)
 
 	if defaultValue, ok := option.FindDefaultOption(parameterOptions); ok {
 		parameter.DefaultValue = defaultValue
@@ -43,6 +52,10 @@ func (cl ConfigureLink) Parameter(name string, parameterOptions ...option.Option
 
 	if listOfValues, ok := option.FindListOfValuesOption(parameterOptions); ok {
 		parameter.ListOfValues = listOfValues
+	}
+
+	if dataType, ok := option.FindDataType(parameterOptions); ok {
+		parameter.DataType = dataType
 	}
 
 	cl.link.Parameters = append(cl.link.Parameters, parameter)

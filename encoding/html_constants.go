@@ -37,9 +37,9 @@ const resourceHtml = `{{define "resource"}}
 							<input type="hidden" name="_method" value="{{$link.Verb}}"></input>
 						{{end}}
 
-						{{range $parameterName, $parameter := $link.Parameters}}
+						{{range $parameter := $link.Parameters}}
 							{{ if $parameter.ListOfValues }}
-								<select name="{{$parameter.Schema}}" placeholder="{{$parameter.Schema}}" value="{{$parameter.DefaultValue}}">
+								<select name="{{$parameter.Name}}" placeholder="{{$parameter.Name}}" value="{{$parameter.DefaultValue}}">
 									{{ range $value := SeparateListOfValues $parameter.ListOfValues }}
 										<option value="$value" {{ if eq $value $parameter.DefaultValue }} selected="selected" {{ end }}>
 											{{ $value }}
@@ -47,7 +47,7 @@ const resourceHtml = `{{define "resource"}}
 									{{ end }}
 								</select>
 							{{ else }}
-								<input name="{{$parameter.Schema}}" placeholder="{{$parameter.Schema}}"	value="{{$parameter.DefaultValue}}"></input>
+								<input name="{{$parameter.Name}}" placeholder="{{$parameter.Name}}"	value="{{$parameter.DefaultValue}}"></input>
 							{{ end }}
 							<br>
 						{{end}}

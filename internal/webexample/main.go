@@ -5,6 +5,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/slyjeff/rest-resource"
 	"github.com/slyjeff/rest-resource/encoding"
+	"github.com/slyjeff/rest-resource/option"
 	"net/http"
 )
 
@@ -23,7 +24,7 @@ func main() {
 
 	e.GET("/application", func(c echo.Context) error {
 		r := newApplicationResource()
-		return respond(c, r)
+		return respond(c, http.StatusOK, r)
 	})
 
 	registerUserHandlers(e)
@@ -35,16 +36,17 @@ func newApplicationResource() resource.Resource {
 	r := resource.NewResource("Application")
 	r.Uri("/application")
 	r.Link("searchUsers", "/user").
-		Parameter("username").
+		Parameter("username", option.DataType("string")).
+		Parameter("is_active", option.DataType("bool")).
 		Schema("UserList").
 		ResponseCodes(http.StatusOK, http.StatusInternalServerError)
 
 	return r
 }
 
-func respond(c echo.Context, r resource.Resource) error {
+func respond(c echo.Context, statusCode int, r resource.Resource) error {
 	value, contentType := encoding.MarshalResource(c.Request().Header, r)
 
 	c.Response().Header().Set("Content-Type", contentType)
-	return c.String(http.StatusOK, value)
+	return c.String(statusCode, value)
 }

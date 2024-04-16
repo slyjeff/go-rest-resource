@@ -1,6 +1,9 @@
 package main
 
-import "strings"
+import (
+	"strconv"
+	"strings"
+)
 
 type userRepo struct {
 	users []user
@@ -17,15 +20,31 @@ func newUserRepo() userRepo {
 	return userRepo
 }
 
-func (r *userRepo) Search(username string) []user {
+func (r *userRepo) Search(userSearch userSearch) []user {
 	users := make([]user, 0)
 	for _, u := range r.users {
-		if strings.Contains(u.Username, username) {
+		if canAdd(u, userSearch) {
 			users = append(users, u)
 		}
 	}
 
 	return users
+}
+
+func canAdd(user user, userSearch userSearch) bool {
+	if userSearch.Username != "" && !strings.Contains(user.Username, userSearch.Username) {
+		return false
+	}
+
+	if userSearch.IsActive != "" {
+		isActive, err := strconv.ParseBool(userSearch.IsActive)
+		if err != nil {
+			return false
+		}
+		return user.IsActive == isActive
+	}
+
+	return true
 }
 
 func (r *userRepo) Add(u *user) {

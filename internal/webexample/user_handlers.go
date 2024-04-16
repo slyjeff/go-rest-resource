@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/slyjeff/rest-resource"
 	"github.com/slyjeff/rest-resource/option"
@@ -17,11 +18,11 @@ func registerUserHandlers(e *echo.Echo) {
 			return c.String(http.StatusInternalServerError, "")
 		}
 
-		users := userRepo.Search(userSearch.Username)
+		users := userRepo.Search(userSearch)
 
 		r := newUserListResource(users, userSearch.Criteria())
 
-		return respond(c, r)
+		return respond(c, http.StatusOK, r)
 	})
 
 	e.GET("/user/:Id", func(c echo.Context) error {
@@ -36,7 +37,7 @@ func registerUserHandlers(e *echo.Echo) {
 		}
 
 		r := newUserResource(*u)
-		return respond(c, r)
+		return respond(c, http.StatusOK, r)
 	})
 
 	e.POST("/user", func(c echo.Context) error {
@@ -48,7 +49,7 @@ func registerUserHandlers(e *echo.Echo) {
 
 		r := newUserResource(user)
 
-		return respond(c, r)
+		return respond(c, http.StatusCreated, r)
 	})
 
 	e.PUT("/user/:Id", func(c echo.Context) error {
@@ -68,7 +69,7 @@ func registerUserHandlers(e *echo.Echo) {
 
 		r := newUserResource(*u)
 
-		return respond(c, r)
+		return respond(c, http.StatusOK, r)
 	})
 
 	e.DELETE("/user/:Id", func(c echo.Context) error {
@@ -88,13 +89,29 @@ func registerUserHandlers(e *echo.Echo) {
 
 type userSearch struct {
 	Username string `query:"username"`
+	IsActive string `query:"is_active"`
 }
 
 func (s userSearch) Criteria() string {
-	if s.Username == "" {
-		return ""
+	c := ""
+	c = addQueryParameter(c, "username", s.Username)
+	c = addQueryParameter(c, "is_active", s.IsActive)
+
+	return c
+}
+
+func addQueryParameter(s, name string, value string) string {
+	if name == "" || value == "" {
+		return s
 	}
-	return "?username=" + s.Username
+
+	if s == "" {
+		s += "?"
+	} else {
+		s += "&"
+	}
+	s += fmt.Sprintf("%s=%v", name, value)
+	return s
 }
 
 func newUserListResource(users []user, queryParams string) resource.Resource {
@@ -110,8 +127,7 @@ func newUserListResource(users []user, queryParams string) resource.Resource {
 	r.Link("createUser", "/user", option.Verb("POST")).
 		Parameter("userName").
 		Parameter("Email").
-		Schema("User").
-		ResponseCodes(http.StatusCreated, http.StatusInternalServerError)
+		Schema("User")
 
 	return r
 }
@@ -124,10 +140,8 @@ func newUserResource(user user) resource.Resource {
 	r.Link("updateUser", url, option.Verb("PUT")).
 		Parameter("username", option.Default(user.Username)).
 		Parameter("email", option.Default(user.Email)).
-		Schema("User").
-		ResponseCodes(http.StatusOK, http.StatusNotFound, http.StatusInternalServerError)
-	r.Link("deleteUser", url, option.Verb("DELETE")).
-		ResponseCodes(http.StatusOK, http.StatusNotFound, http.StatusInternalServerError)
+		Schema("User")
+	r.Link("deleteUser", url, option.Verb("DELETE"))
 
 	return r
 }

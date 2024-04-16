@@ -25,3 +25,11 @@ func ListOfValues[K any](values []K) Option {
 func FindListOfValuesOption(options []Option) (string, bool) {
 	return findOption(options, "listOfValues")
 }
+
+func DataType(dataType string) Option {
+	return Option{"dataType", dataType}
+}
+
+func FindDataType(options []Option) (string, bool) {
+	return findOption(options, "dataType")
+}

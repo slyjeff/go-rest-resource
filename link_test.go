@@ -123,6 +123,20 @@ func Test_LinkMustAddParametersWithListOfValues(t *testing.T) {
 	a.Equal("1,2,3", link.Parameters[0].ListOfValues)
 }
 
+func Test_LinkMustAddDataType(t *testing.T) {
+	//arrange
+	r := NewResource()
+
+	//act
+	r.Link("searchUsers", "/user").
+		Parameter("age", option.DataType("Int64"))
+
+	//assert
+	a := assert.New(t)
+	link, _ := r.Links["searchUsers"]
+	a.Equal("Int64", link.Parameters[0].DataType)
+}
+
 func Test_LinkMustSetSchema(t *testing.T) {
 	//arrange
 	r := NewResource("User")
@@ -138,18 +152,101 @@ func Test_LinkMustSetSchema(t *testing.T) {
 	a.Equal("UserList", link.Schema)
 }
 
-func Test_LinkMustSetResponseCodes(t *testing.T) {
+func Test_GetLinkMustHaveDefaultResponseCodesIfNotSet(t *testing.T) {
 	//arrange
 	r := NewResource("User")
 
 	//act
-	r.Link("searchUsers", "/user").
-		ResponseCodes(http.StatusOK, http.StatusInternalServerError)
+	r.Link("searchUsers", "/user")
 
 	//assert
 	a := assert.New(t)
 	link, _ := r.Links["searchUsers"]
 
 	a.Equal(http.StatusOK, link.ResponseCodes[0])
-	a.Equal(http.StatusInternalServerError, link.ResponseCodes[1])
+	a.Equal(http.StatusNotFound, link.ResponseCodes[1])
+	a.Equal(http.StatusInternalServerError, link.ResponseCodes[2])
+}
+
+func Test_PostLinkMustHaveDefaultResponseCodesIfNotSet(t *testing.T) {
+	//arrange
+	r := NewResource("User")
+
+	//act
+	r.Link("createUser", "/user", option.Verb("POST"))
+
+	//assert
+	a := assert.New(t)
+	link, _ := r.Links["createUser"]
+
+	a.Equal(http.StatusCreated, link.ResponseCodes[0])
+	a.Equal(http.StatusBadRequest, link.ResponseCodes[1])
+	a.Equal(http.StatusInternalServerError, link.ResponseCodes[2])
+}
+
+func Test_PutLinkMustHaveDefaultResponseCodesIfNotSet(t *testing.T) {
+	//arrange
+	r := NewResource("User")
+
+	//act
+	r.Link("updateUser", "/user/1234", option.Verb("PUT"))
+
+	//assert
+	a := assert.New(t)
+	link, _ := r.Links["updateUser"]
+
+	a.Equal(http.StatusOK, link.ResponseCodes[0])
+	a.Equal(http.StatusBadRequest, link.ResponseCodes[1])
+	a.Equal(http.StatusNotFound, link.ResponseCodes[2])
+	a.Equal(http.StatusInternalServerError, link.ResponseCodes[3])
+}
+
+func Test_PatchLinkMustHaveDefaultResponseCodesIfNotSet(t *testing.T) {
+	//arrange
+	r := NewResource("User")
+
+	//act
+	r.Link("updateUser", "/user/1234", option.Verb("PATCH"))
+
+	//assert
+	a := assert.New(t)
+	link, _ := r.Links["updateUser"]
+
+	a.Equal(http.StatusOK, link.ResponseCodes[0])
+	a.Equal(http.StatusBadRequest, link.ResponseCodes[1])
+	a.Equal(http.StatusNotFound, link.ResponseCodes[2])
+	a.Equal(http.StatusInternalServerError, link.ResponseCodes[3])
+}
+
+func Test_DeleteLinkMustHaveDefaultResponseCodesIfNotSet(t *testing.T) {
+	//arrange
+	r := NewResource("User")
+
+	//act
+	r.Link("deleteUser", "/user/1234", option.Verb("DELETE"))
+
+	//assert
+	a := assert.New(t)
+	link, _ := r.Links["deleteUser"]
+
+	a.Equal(http.StatusOK, link.ResponseCodes[0])
+	a.Equal(http.StatusNotFound, link.ResponseCodes[1])
+	a.Equal(http.StatusInternalServerError, link.ResponseCodes[2])
+}
+
+func Test_SettingResponseCodesMustOverrideDefaults(t *testing.T) {
+	//arrange
+	r := NewResource("User")
+
+	//act
+	r.Link("searchUsers", "/user").
+		ResponseCodes(http.StatusCreated, http.StatusNotFound)
+
+	//assert
+	a := assert.New(t)
+	link, _ := r.Links["searchUsers"]
+
+	a.Equal(2, len(link.ResponseCodes))
+	a.Equal(http.StatusCreated, link.ResponseCodes[0])
+	a.Equal(http.StatusNotFound, link.ResponseCodes[1])
 }
