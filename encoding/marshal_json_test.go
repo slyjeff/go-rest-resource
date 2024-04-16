@@ -201,6 +201,22 @@ func Test_MarshalJsonMustOutputLinkParameterListOfValues(t *testing.T) {
 	a.Equal(expectedJson, string(json))
 }
 
+func Test_MarshalJsonMustOutputDataType(t *testing.T) {
+	//arrange
+	var r resource.Resource
+	r.Link("createUser", "/user").
+		Parameter("param1", option.DataType("Int"))
+
+	//act
+	json, err := MarshalJson(r)
+
+	//assert
+	a := assert.New(t)
+	a.NoError(err)
+	expectedJson := `{"_links":{"createUser":{"href":"/user","parameters":{"param1":{"dataType":"Int"}}}}}`
+	a.Equal(expectedJson, string(json))
+}
+
 func Test_MarshalJsonMustOutputEmbeddedResource(t *testing.T) {
 	//arrange
 	var parent = resource.NewResource("parent")
