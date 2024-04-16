@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/slyjeff/rest-resource"
 	"github.com/slyjeff/rest-resource/option"
@@ -100,6 +99,7 @@ func (s userSearch) Criteria() string {
 
 func newUserListResource(users []user, queryParams string) resource.Resource {
 	r := resource.NewResource("UserList")
+	r.Uri("/user" + queryParams)
 
 	userResources := make([]resource.Resource, len(users))
 	for i, user := range users {
@@ -107,7 +107,6 @@ func newUserListResource(users []user, queryParams string) resource.Resource {
 	}
 
 	r.EmbedResources("users", userResources)
-	r.Link("_self", "/user"+queryParams)
 	r.LinkWithParameters("createUser", "/user", option.Verb("POST")).
 		Parameter("userName").
 		Parameter("Email")
@@ -116,13 +115,13 @@ func newUserListResource(users []user, queryParams string) resource.Resource {
 }
 
 func newUserResource(user user) resource.Resource {
-	url := fmt.Sprintf("/user/%d", user.id)
+	url := resource.ConstructUriFromTemplate("/user/{id}", user.id)
 	r := resource.NewResource("User")
+	r.Uri(url)
 	r.MapAllDataFrom(user)
-	r.Link("_self", url)
-	r.LinkWithParameters("update", url, option.Verb("PUT")).
+	r.LinkWithParameters("updateUser", url, option.Verb("PUT")).
 		Parameter("username", option.Default(user.Username)).
 		Parameter("email", option.Default(user.Email))
-	r.Link("delete", url, option.Verb("DELETE"))
+	r.Link("deleteUser", url, option.Verb("DELETE"))
 	return r
 }

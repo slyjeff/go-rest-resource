@@ -20,6 +20,12 @@ func (r *Resource) Link(name string, href string, linkOptions ...option.Option) 
 }
 
 //goland:noinspection GoMixedReceiverTypes
+func (r *Resource) Uri(href string) *Resource {
+	r.Link("self", href)
+	return r
+}
+
+//goland:noinspection GoMixedReceiverTypes
 func (r *Resource) LinkWithParameters(name string, href string, linkOptions ...option.Option) ConfigureLinkParameters {
 	r.Link(name, href, linkOptions...)
 

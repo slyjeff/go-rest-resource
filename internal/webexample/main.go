@@ -10,20 +10,19 @@ import (
 
 func main() {
 	e := echo.New()
+
 	e.Pre(middleware.MethodOverrideWithConfig(middleware.MethodOverrideConfig{
 		Getter: middleware.MethodFromForm("_method"),
 	}))
+
+	e.GET("/doc", getDocumentation)
 
 	e.GET("/", func(c echo.Context) error {
 		return c.Redirect(301, "/application")
 	})
 
 	e.GET("/application", func(c echo.Context) error {
-		r := resource.NewResource("Application")
-		r.Link("/self", "/application")
-		r.LinkWithParameters("searchUsers", "/user").
-			Parameter("username")
-
+		r := newApplicationResource()
 		return respond(c, r)
 	})
 
@@ -32,8 +31,18 @@ func main() {
 	e.Logger.Fatal(e.Start(":8090"))
 }
 
+func newApplicationResource() resource.Resource {
+	r := resource.NewResource("Application")
+	r.Uri("/application")
+	r.LinkWithParameters("searchUsers", "/user").
+		Parameter("username")
+
+	return r
+}
+
 func respond(c echo.Context, r resource.Resource) error {
 	value, contentType := encoding.MarshalResource(c.Request().Header, r)
+
 	c.Response().Header().Set("Content-Type", contentType)
 	return c.String(http.StatusOK, value)
 }

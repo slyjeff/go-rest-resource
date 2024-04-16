@@ -23,6 +23,22 @@ func Test_LinkMustAddLinkToResource(t *testing.T) {
 	a.False(link.IsTemplated)
 }
 
+func Test_UriMustAddSelfLinkToResource(t *testing.T) {
+	//arrange
+	resource := NewResource()
+
+	//act
+	resource.Uri("/user")
+
+	//assert
+	a := assert.New(t)
+	link, ok := resource.Links["self"]
+	a.True(ok)
+	a.Equal("/user", link.Href)
+	a.Equal("GET", link.Verb)
+	a.False(link.IsTemplated)
+}
+
 func Test_LinkMustAddLinkToResourceWithVerb(t *testing.T) {
 	//arrange
 	var resource Resource
