@@ -149,7 +149,7 @@ func Test_LinkMustSetResponseSchema(t *testing.T) {
 	a := assert.New(t)
 	link, _ := r.Links["searchUsers"]
 
-	a.Equal("UserList", link.Schema)
+	a.Equal("UserList", link.ResponseSchema)
 }
 
 func Test_GetLinkMustHaveDefaultResponseCodesIfNotSet(t *testing.T) {

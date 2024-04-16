@@ -63,8 +63,8 @@ func (cl ConfigureLink) Parameter(name string, parameterOptions ...option.Option
 	return cl
 }
 
-func (cl ConfigureLink) ResponseSchema(schema string) ConfigureLink {
-	cl.link.Schema = schema
+func (cl ConfigureLink) ResponseSchema(responseSchema string) ConfigureLink {
+	cl.link.ResponseSchema = responseSchema
 	return cl
 }
 
