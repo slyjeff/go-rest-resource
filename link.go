@@ -8,7 +8,7 @@ import (
 //goland:noinspection GoMixedReceiverTypes
 func (r *Resource) Uri(href string) *Resource {
 	r.Link("self", href).
-		Schema(r.Schema)
+		ResponseSchema(r.Schema)
 
 	return r
 }
@@ -63,7 +63,7 @@ func (cl ConfigureLink) Parameter(name string, parameterOptions ...option.Option
 	return cl
 }
 
-func (cl ConfigureLink) Schema(schema string) ConfigureLink {
+func (cl ConfigureLink) ResponseSchema(schema string) ConfigureLink {
 	cl.link.Schema = schema
 	return cl
 }

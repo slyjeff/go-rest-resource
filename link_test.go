@@ -137,13 +137,13 @@ func Test_LinkMustAddDataType(t *testing.T) {
 	a.Equal("Int64", link.Parameters[0].DataType)
 }
 
-func Test_LinkMustSetSchema(t *testing.T) {
+func Test_LinkMustSetResponseSchema(t *testing.T) {
 	//arrange
 	r := NewResource("User")
 
 	//act
 	r.Link("searchUsers", "/user").
-		Schema("UserList")
+		ResponseSchema("UserList")
 
 	//assert
 	a := assert.New(t)

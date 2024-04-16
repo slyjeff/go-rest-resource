@@ -127,7 +127,7 @@ func newUserListResource(users []user, queryParams string) resource.Resource {
 	r.Link("createUser", "/user", option.Verb("POST")).
 		Parameter("userName").
 		Parameter("Email").
-		Schema("User")
+		ResponseSchema("User")
 
 	return r
 }
@@ -140,7 +140,7 @@ func newUserResource(user user) resource.Resource {
 	r.Link("updateUser", url, option.Verb("PUT")).
 		Parameter("username", option.Default(user.Username)).
 		Parameter("email", option.Default(user.Email)).
-		Schema("User")
+		ResponseSchema("User")
 	r.Link("deleteUser", url, option.Verb("DELETE"))
 
 	return r
