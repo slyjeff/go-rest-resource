@@ -69,23 +69,28 @@ func (openApi *openApi) addPath(link resource.Link, summary string) {
 	path, ok := openApi.Paths[link.Href]
 	if !ok {
 		path = make(Path)
-		openApi.Paths[link.Href] = path
-	}
-
-	parameters := getPathParameters(link.Href)
-	if len(parameters) > 0 {
-		path["parameters"] = parameters
+		parameters := getPathParameters(link.Href)
+		if len(parameters) > 0 {
+			path["parameters"] = parameters
+		}
+		openApi.Paths[link.Href] = make(Path)
 	}
 
 	verb := strings.ToLower(link.Verb)
-	if _, ok := path[verb]; !ok {
-		queryParameters := getQueryParameters(link)
+
+	queryParameters := getQueryParameters(link)
+	operation, ok := path[verb]
+	if !ok {
 		bodySchema := ""
 		if link.Verb != "GET" && link.Schema != "" && len(link.Parameters) > 0 {
 			bodySchema = link.Verb + link.Schema
 		}
 
 		path[verb] = newOperation(link.ResponseCodes, formatSummary(summary), link.Schema, queryParameters, bodySchema)
+	} else if len(queryParameters) > 0 {
+		if o, ok := operation.(Operation); ok {
+			o.QueryParameters = queryParameters
+		}
 	}
 }
 

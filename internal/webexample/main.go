@@ -38,7 +38,6 @@ func newApplicationResource() resource.Resource {
 	r.Link("searchUsers", "/user").
 		Parameter("username", option.DataType("string")).
 		Parameter("is_active", option.DataType("bool")).
-		ResponseSchema("UserList").
 		ResponseCodes(http.StatusOK, http.StatusInternalServerError)
 
 	return r
