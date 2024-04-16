@@ -43,11 +43,11 @@ func newOpenApi(info Info, server string, resources []resource.Resource) openApi
 		}
 
 		for _, link := range r.Links {
-			if link.Verb == "GET" || len(link.Parameters) == 0 || link.Schema == "" {
+			if link.Verb == "GET" || len(link.Parameters) == 0 || link.ResponseSchema == "" {
 				continue
 			}
 
-			bodySchema := link.Verb + link.Schema
+			bodySchema := link.Verb + link.ResponseSchema
 			if _, ok := doc.Components.Schemas[bodySchema]; !ok {
 				doc.Components.Schemas[bodySchema] = newSchemaFromParameters(link.Parameters)
 			}
@@ -73,7 +73,7 @@ func (openApi *openApi) addPath(link resource.Link, summary string) {
 		if len(parameters) > 0 {
 			path["parameters"] = parameters
 		}
-		openApi.Paths[link.Href] = make(Path)
+		openApi.Paths[link.Href] = path
 	}
 
 	verb := strings.ToLower(link.Verb)
@@ -82,11 +82,11 @@ func (openApi *openApi) addPath(link resource.Link, summary string) {
 	operation, ok := path[verb]
 	if !ok {
 		bodySchema := ""
-		if link.Verb != "GET" && link.Schema != "" && len(link.Parameters) > 0 {
-			bodySchema = link.Verb + link.Schema
+		if link.Verb != "GET" && link.ResponseSchema != "" && len(link.Parameters) > 0 {
+			bodySchema = link.Verb + link.ResponseSchema
 		}
 
-		path[verb] = newOperation(link.ResponseCodes, formatSummary(summary), link.Schema, queryParameters, bodySchema)
+		path[verb] = newOperation(link.ResponseCodes, formatSummary(summary), link.ResponseSchema, queryParameters, bodySchema)
 	} else if len(queryParameters) > 0 {
 		if o, ok := operation.(Operation); ok {
 			o.QueryParameters = queryParameters

@@ -25,12 +25,12 @@ func NewResource(schema ...string) Resource {
 }
 
 type Link struct {
-	Href          string
-	Verb          string
-	IsTemplated   bool
-	Parameters    []LinkParameter
-	Schema        string
-	ResponseCodes []int
+	Href           string
+	Verb           string
+	IsTemplated    bool
+	Parameters     []LinkParameter
+	ResponseSchema string
+	ResponseCodes  []int
 }
 
 func newLink(href string) Link {
