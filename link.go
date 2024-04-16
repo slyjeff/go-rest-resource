@@ -8,7 +8,7 @@ import (
 //goland:noinspection GoMixedReceiverTypes
 func (r *Resource) Uri(href string) *Resource {
 	r.Link("self", href).
-		Schema(r.Name).
+		Schema(r.Schema).
 		ResponseCodes(http.StatusOK, http.StatusNotFound, http.StatusInternalServerError)
 
 	return r

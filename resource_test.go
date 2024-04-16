@@ -5,24 +5,24 @@ import (
 	"testing"
 )
 
-func Test_NewResourceWithoutSettingNameMustBeEmpty(t *testing.T) {
+func Test_NewResourceWithoutSettingSchemaMustBeEmpty(t *testing.T) {
 	//arrange
 	//act
 	resource := NewResource()
 
 	//assert
 	a := assert.New(t)
-	a.Equal(resource.Name, "")
+	a.Equal(resource.Schema, "")
 }
 
-func Test_NewResourceMustSetName(t *testing.T) {
+func Test_NewResourceMustSetSchema(t *testing.T) {
 	//arrange
-	name := "Test Name"
+	schema := "TestSchema"
 
 	//act
-	resource := NewResource(name)
+	resource := NewResource(schema)
 
 	//assert
 	a := assert.New(t)
-	a.Equal(resource.Name, name)
+	a.Equal(resource.Schema, schema)
 }

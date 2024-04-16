@@ -16,7 +16,7 @@ const resourceHtml = `{{define "resource"}}
 			<td>{{$embeddedName}}</td>
 			<td>
 			{{range $resource := GetEmbeddedList $resources}}
-				<h2>{{$resource.Name}}</h2>
+				<h2>{{$resource.Schema}}</h2>
 				{{template "resource" $resource}}
 			{{end}}
 			</td>
@@ -39,7 +39,7 @@ const resourceHtml = `{{define "resource"}}
 
 						{{range $parameterName, $parameter := $link.Parameters}}
 							{{ if $parameter.ListOfValues }}
-								<select name="{{$parameter.Name}}" placeholder="{{$parameter.Name}}" value="{{$parameter.DefaultValue}}">
+								<select name="{{$parameter.Schema}}" placeholder="{{$parameter.Schema}}" value="{{$parameter.DefaultValue}}">
 									{{ range $value := SeparateListOfValues $parameter.ListOfValues }}
 										<option value="$value" {{ if eq $value $parameter.DefaultValue }} selected="selected" {{ end }}>
 											{{ $value }}
@@ -47,7 +47,7 @@ const resourceHtml = `{{define "resource"}}
 									{{ end }}
 								</select>
 							{{ else }}
-								<input name="{{$parameter.Name}}" placeholder="{{$parameter.Name}}"	value="{{$parameter.DefaultValue}}"></input>
+								<input name="{{$parameter.Schema}}" placeholder="{{$parameter.Schema}}"	value="{{$parameter.DefaultValue}}"></input>
 							{{ end }}
 							<br>
 						{{end}}
@@ -71,7 +71,7 @@ const resourceHtml = `{{define "resource"}}
 {{end}}<!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>{{.Name}}</title>
+    <title>{{.Schema}}</title>
 	<style>
 		body{
 		    margin: 0;
@@ -198,7 +198,7 @@ const resourceHtml = `{{define "resource"}}
 <body>
 	<div class="container">
 		<div class="header">
-			<h1 class="header-heading">{{.Name}}</h1>
+			<h1 class="header-heading">{{.Schema}}</h1>
 		</div>
 		<div class="content">
 		{{template "resource" .}}

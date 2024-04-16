@@ -126,7 +126,6 @@ func newUserResource(user user) resource.Resource {
 		Parameter("email", option.Default(user.Email)).
 		Schema("User").
 		ResponseCodes(http.StatusOK, http.StatusNotFound, http.StatusInternalServerError)
-
 	r.Link("deleteUser", url, option.Verb("DELETE")).
 		ResponseCodes(http.StatusOK, http.StatusNotFound, http.StatusInternalServerError)
 

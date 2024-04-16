@@ -29,20 +29,20 @@ func newOpenApi(info Info, server string, resources []resource.Resource) openApi
 	for _, r := range resources {
 		for linkName, link := range r.Links {
 			if linkName == "self" {
-				linkName = "Get" + r.Name
+				linkName = "Get" + r.Schema
 			}
 			doc.addPath(*link, linkName)
 		}
 
-		if r.Name == "" {
+		if r.Schema == "" {
 			continue
 		}
 
-		if _, ok := doc.Components.Schemas[r.Name]; ok {
+		if _, ok := doc.Components.Schemas[r.Schema]; ok {
 			continue
 		}
 
-		doc.Components.Schemas[r.Name] = newSchemaFromResource(r)
+		doc.Components.Schemas[r.Schema] = newSchemaFromResource(r)
 	}
 
 	return doc

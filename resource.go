@@ -1,20 +1,20 @@
 package resource
 
 type Resource struct {
-	Name     string
+	Schema   string
 	Values   MappedData
 	Links    LinkData
 	Embedded EmbeddedResources
 }
 
-func NewResource(name ...string) Resource {
-	n := ""
-	if len(name) > 0 {
-		n = name[0]
+func NewResource(schema ...string) Resource {
+	s := ""
+	if len(schema) > 0 {
+		s = schema[0]
 	}
 
 	r := Resource{
-		n,
+		s,
 		make(map[string]interface{}),
 		make(map[string]*Link),
 		make(EmbeddedResources)}
