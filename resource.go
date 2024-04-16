@@ -47,10 +47,6 @@ type ResponseCode struct {
 	Schema      string
 }
 
-func newResponseCode(status int, description string, schema string) ResponseCode {
-	return ResponseCode{status, description, schema}
-}
-
 type MappedData map[string]interface{}
 
 type LinkData map[string]*Link
