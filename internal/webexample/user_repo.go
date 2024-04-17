@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/google/uuid"
 	"strconv"
 	"strings"
 )
@@ -11,10 +12,10 @@ type userRepo struct {
 
 func newUserRepo() userRepo {
 	userRepo := userRepo{[]user{
-		{1, "ajones", "ajones@aol.com", true},
-		{2, "sanderson", "sanderson@gmail.com", false},
-		{3, "mwilliams", "mwilliams@gmail.com", true},
-		{4, "jsmith", "jsmith@outlook.com", true},
+		{uuid.New(), "ajones", "ajones@aol.com", true},
+		{uuid.New(), "sanderson", "sanderson@gmail.com", false},
+		{uuid.New(), "mwilliams", "mwilliams@gmail.com", true},
+		{uuid.New(), "jsmith", "jsmith@outlook.com", true},
 	}}
 
 	return userRepo
@@ -48,22 +49,11 @@ func canAdd(user user, userSearch userSearch) bool {
 }
 
 func (r *userRepo) Add(u *user) {
-	u.Id = r.GetUniqueId()
+	u.Id = uuid.New()
 	r.users = append(r.users, *u)
 }
 
-func (r *userRepo) GetUniqueId() int {
-	id := 1
-	for _, u := range r.users {
-		if u.Id >= id {
-			id = u.Id + 1
-		}
-	}
-
-	return id
-}
-
-func (r *userRepo) GetById(id int) (*user, bool) {
+func (r *userRepo) GetById(id uuid.UUID) (*user, bool) {
 	for _, u := range r.users {
 		if u.Id == id {
 			return &u, true
@@ -73,7 +63,7 @@ func (r *userRepo) GetById(id int) (*user, bool) {
 	return nil, false
 }
 
-func (r *userRepo) Delete(id int) bool {
+func (r *userRepo) Delete(id uuid.UUID) bool {
 	foundIndex := -1
 	for i, u := range r.users {
 		if u.Id == id {

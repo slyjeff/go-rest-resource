@@ -103,9 +103,17 @@ func getPathParameters(url string) []Parameter {
 		return parameters
 	}
 
-	for _, parameter := range parameterNames {
-		parameter = parameter[1 : len(parameter)-1]
-		parameters = append(parameters, Parameter{parameter, "path", true, newIntSchema()})
+	for _, parameterName := range parameterNames {
+		parameterName = parameterName[1 : len(parameterName)-1] //stripping off the {} around the name
+
+		var schema Schema
+		if strings.Contains(strings.ToLower(parameterName), "uuid") {
+			schema = newGuidSchema()
+		} else {
+			schema = newIntSchema()
+		}
+
+		parameters = append(parameters, Parameter{parameterName, "path", true, schema})
 	}
 
 	return parameters
@@ -284,6 +292,10 @@ func newFloatSchema() Schema {
 
 func newBoolSchema() Schema {
 	return Schema{"boolean", "", make(map[string]Schema), nil}
+}
+
+func newGuidSchema() Schema {
+	return Schema{"string", "uuid", make(map[string]Schema), nil}
 }
 
 func newStringSchema() Schema {

@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/slyjeff/rest-resource"
 	"github.com/slyjeff/rest-resource/option"
 	"net/http"
-	"strconv"
 )
 
 func registerUserHandlers(e *echo.Echo) {
@@ -26,7 +26,7 @@ func registerUserHandlers(e *echo.Echo) {
 	})
 
 	e.GET("/user/:Id", func(c echo.Context) error {
-		id, err := strconv.Atoi(c.Param("Id"))
+		id, err := uuid.Parse(c.Param("Id"))
 		if err != nil {
 			return c.String(http.StatusBadRequest, "Invalid Id")
 		}
@@ -53,7 +53,7 @@ func registerUserHandlers(e *echo.Echo) {
 	})
 
 	e.PUT("/user/:Id", func(c echo.Context) error {
-		id, err := strconv.Atoi(c.Param("Id"))
+		id, err := uuid.Parse(c.Param("Id"))
 		if err != nil {
 			return c.String(http.StatusBadRequest, "Invalid Id")
 		}
@@ -73,7 +73,7 @@ func registerUserHandlers(e *echo.Echo) {
 	})
 
 	e.DELETE("/user/:Id", func(c echo.Context) error {
-		id, err := strconv.Atoi(c.Param("Id"))
+		id, err := uuid.Parse(c.Param("Id"))
 		if err != nil {
 			return c.String(http.StatusBadRequest, "Invalid Id")
 		}
@@ -133,7 +133,7 @@ func newUserListResource(users []user, queryParams string) resource.Resource {
 }
 
 func newUserResource(user user) resource.Resource {
-	url := resource.ConstructUriFromTemplate("/user/{Id}", user.Id)
+	url := resource.ConstructUriFromTemplate("/user/{UserUUID}", user.Id)
 	r := resource.NewResource("User")
 	r.Uri(url)
 	r.MapAllDataFrom(user)
